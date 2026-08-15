@@ -1,0 +1,48 @@
+.assumptions-checker {
+  margin-top: 0;
+}
+
+.assumption-row {
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.assumption-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.assumption-icon--supported {
+  background: rgba(76, 175, 80, 0.15);
+  color: var(--success);
+}
+
+.assumption-icon--unsupported {
+  background: rgba(244, 67, 54, 0.15);
+  color: var(--danger);
+}
+
+.assumption-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.assumption-evidence {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}

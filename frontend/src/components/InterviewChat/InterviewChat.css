@@ -1,0 +1,136 @@
+.interview-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 520px;
+  background: var(--surface);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.interview-progress {
+  background: var(--surface);
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.interview-progress-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.interview-progress-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.interview-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.interview-dot--completed {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.interview-dot--current {
+  background: transparent;
+  border-color: var(--accent);
+}
+
+.interview-messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.interview-message-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.interview-message-row--user {
+  justify-content: flex-end;
+}
+
+.interview-avatar {
+  width: 36px;
+  height: 36px;
+  background: var(--accent-dim);
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.interview-bubble {
+  max-width: 75%;
+  padding: 14px 18px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.interview-bubble--ai {
+  background: var(--surface2);
+  border-radius: 0 16px 16px 16px;
+  color: var(--text);
+}
+
+.interview-bubble--user {
+  background: var(--accent);
+  border-radius: 16px 0 16px 16px;
+  color: var(--text);
+  align-self: flex-end;
+}
+
+.interview-input-area {
+  background: var(--surface);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+}
+
+.interview-input {
+  flex-grow: 1;
+  background: var(--surface2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: var(--text);
+  padding: 12px;
+  resize: none;
+  height: 52px;
+}
+
+.interview-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.interview-send {
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  color: var(--text);
+  padding: 0 24px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.interview-send:hover {
+  opacity: 0.88;
+}

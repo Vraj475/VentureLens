@@ -1,0 +1,67 @@
+.analysis-page {
+  min-height: 100vh;
+  padding: 40px 24px;
+}
+
+.analysis-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.analysis-skip-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.analysis-skip-btn {
+  background: var(--surface2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.analysis-skip-btn:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.analysis-section-heading {
+  margin-bottom: 24px;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.analysis-results {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.analysis-subheading {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.analysis-report-btn {
+  display: block;
+  margin: 16px auto 0;
+  background: var(--accent);
+  color: var(--text);
+  border: none;
+  border-radius: 10px;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.analysis-report-btn:hover {
+  opacity: 0.88;
+}

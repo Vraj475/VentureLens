@@ -1,0 +1,310 @@
+# VentureLens — AI-Powered Business Idea Validation Platform
+
+## Overview
+
+VentureLens is a full-stack MERN application that validates business ideas using a multi-step pipeline: structured idea extraction → guided interview → RAG-based knowledge retrieval → live web research → multi-dimensional AI analysis → devil's advocate challenge → shareable markdown report. The goal is a simple, accurate, and polished product with zero scope creep.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 18 + Vite, React Router DOM v6, Recharts, React Markdown, Axios |
+| Backend | Node.js, Express.js, Mongoose, uuid, dotenv, cors, node-fetch |
+| Database | MongoDB (Atlas or local) |
+| Primary LLM | Gemini API (`gemini-1.5-flash` + `text-embedding-004`) via `@google/generative-ai` |
+| Devil's Advocate LLM | OpenRouter API (`mistralai/mistral-7b-instruct`) via REST fetch |
+| Web Search | Serper API (`google.serper.dev`) |
+
+---
+
+## Proposed Changes
+
+### Backend
+
+---
+
+#### [NEW] `backend/server.js`
+- Entry point. Loads `.env`, connects MongoDB, mounts middleware (`cors`, `express.json`), mounts routes at `/api/sessions` and `/api/reports`, mounts `errorHandler` last.
+
+#### [NEW] `backend/.env.example`
+- Template with all 5 env vars: `PORT`, `MONGODB_URI`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `SERPER_API_KEY`, `NODE_ENV`.
+
+---
+
+#### [NEW] `backend/src/models/Session.model.js`
+Full Mongoose schema with all fields as specified:
+- `sessionId` (UUID, required, unique)
+- `status` (enum: idle → interviewing → researching → analyzing → complete)
+- `rawIdea`, `structuredIdea`, `interviewQuestions`, `interviewAnswers`
+- `businessProfile`, `ragResults`, `webResults`
+- `analysis` (6 dimension sub-objects each with score/reasoning/evidence[])
+- `feasibilityScore`, `risks[]`, `assumptions[]`, `devilsAdvocate`
+- `reportId`, `createdAt`
+
+#### [NEW] `backend/src/models/Report.model.js`
+- `reportId`, `sessionId`, `reportMarkdown`, `feasibilityScore`, `analysis`, `risks`, `devilsAdvocate`, `businessProfile`, `createdAt`
+
+---
+
+#### [NEW] `backend/src/routes/session.routes.js`
+Maps the following to controller methods:
+- `POST /` → `createSession`
+- `POST /:id/idea` → `submitIdea`
+- `POST /:id/answer` → `submitAnswer`
+- `GET /:id/research` → `startResearch` (SSE endpoint)
+- `POST /:id/analyze` → `analyzeSession`
+- `POST /:id/challenge` → `challengeIdea`
+- `POST /:id/report` → `generateReport`
+
+> [!NOTE]
+> Research is a `GET` with SSE (EventSource from browser can only do GET). The frontend uses `EventSource` for this endpoint.
+
+#### [NEW] `backend/src/routes/report.routes.js`
+- `GET /:reportId` → `getReport`
+
+---
+
+#### [NEW] `backend/src/controllers/session.controller.js`
+Thin controller layer — delegates all heavy logic to services. Each function:
+1. Extracts params/body
+2. Calls one or more services
+3. Updates session in DB
+4. Returns response / streams SSE
+
+#### [NEW] `backend/src/controllers/report.controller.js`
+- `generateReport`: calls `report.service.js`, saves Report doc, updates session.reportId
+- `getReport`: fetches Report by reportId
+
+---
+
+#### [NEW] `backend/src/services/gemini.service.js`
+Four exported functions using `@google/generative-ai`:
+1. `structureIdea(rawIdea)` — JSON mode extraction
+2. `generateNextQuestion(unansweredSlot, structuredIdea)` — returns question string
+3. `analyzeOneDimension(name, businessProfile, ragContext, webContext)` — JSON mode, returns `{score, reasoning, evidence[]}`
+4. `generateReportMarkdown(sessionData)` — returns full markdown string
+
+#### [NEW] `backend/src/services/embedding.service.js`
+- `generateEmbedding(text)` — uses `text-embedding-004`, returns 768-dim float array
+
+#### [NEW] `backend/src/services/rag.service.js`
+- `retrieveRelevantChunks(query, topK=5)` — embeds query, loads all `knowledge_chunks`, cosine-ranks, filters >0.6, returns top K
+
+#### [NEW] `backend/src/services/webResearch.service.js`
+- `searchWeb(query)` — POST to Serper, returns `[{title, url, snippet}]`
+- `runResearchQueries(businessProfile)` — runs 3 Serper searches (market size India, competitors India, customer pain points), returns merged array
+
+#### [NEW] `backend/src/services/openrouter.service.js`
+- `challengeIdea(businessProfile, feasibilityScore)` — REST POST to OpenRouter, model `mistralai/mistral-7b-instruct`, returns devil's advocate string
+
+#### [NEW] `backend/src/services/analysis.service.js`
+- `analyzeAllDimensions(businessProfile, ragResults, webResults)` — calls `analyzeOneDimension` 6 times (sequentially or in parallel), assembles full analysis object, also extracts `risks[]` and `assumptions[]`
+
+#### [NEW] `backend/src/services/scoring.service.js`
+- `computeFeasibilityScore(analysis)` — weighted formula: market×0.20 + problem×0.15 + revenue×0.15 + competition×0.15 + founder×0.10 + (100−risk)×0.25
+
+#### [NEW] `backend/src/services/report.service.js`
+- `buildReport(session)` — calls `generateReportMarkdown`, generates UUID reportId, returns assembled report object
+
+---
+
+#### [NEW] `backend/src/middleware/errorHandler.js`
+- Express 4-arg error handler: `(err, req, res, next)` — returns `{error: err.message}` with appropriate status code.
+
+#### [NEW] `backend/src/utils/cosineSimilarity.js`
+- `cosineSimilarity(a, b)` — dot product / (|a| × |b|), handles zero vectors safely.
+
+#### [NEW] `backend/src/utils/chunkText.js`
+- `chunkText(text, chunkSize=300, overlap=50)` — word-based sliding window chunking.
+
+---
+
+#### [NEW] `backend/scripts/ingestKnowledgeBase.js`
+Standalone script (run once):
+1. Reads all 10 `.txt` files from `data/knowledge-base/`
+2. Chunks each with `chunkText`
+3. Generates embeddings with `embedding.service.js`
+4. Upserts docs into `knowledge_chunks` collection (idempotent via chunkId)
+
+#### [NEW] `backend/data/knowledge-base/*.txt` (10 files)
+Each 400–600 words of real, useful content on the topic. Files:
+- `business-model-canvas.txt`
+- `porters-five-forces.txt`
+- `tam-sam-som-methodology.txt`
+- `startup-failure-modes.txt`
+- `revenue-model-types.txt`
+- `market-sizing-guide.txt`
+- `india-startup-ecosystem.txt`
+- `b2b-vs-b2c-validation.txt`
+- `customer-discovery-methods.txt`
+- `unit-economics-basics.txt`
+
+---
+
+### Frontend
+
+---
+
+#### [NEW] `frontend/src/main.jsx`
+- Mounts `<App />` into `#root` with `React.StrictMode`.
+
+#### [NEW] `frontend/src/App.jsx`
+- `BrowserRouter` with routes:
+  - `/` → `Home`
+  - `/analysis/:sessionId` → `Analysis`
+  - `/report/:reportId` → `Report`
+
+#### [NEW] `frontend/src/index.css`
+- CSS custom properties (`:root`) for the design system: dark navy background (`#0D0F1C`), white text, accent purple `#6C63FF`, card backgrounds, border-radius, shadows, font (`Inter` from Google Fonts).
+
+---
+
+#### [NEW] `frontend/src/pages/Home.jsx`
+- Landing page with headline and subheading
+- Renders `<IdeaInput />`
+- On submit: `POST /api/sessions` → `POST /api/sessions/:id/idea` → `navigate('/analysis/:id', { state: {...} })`
+
+#### [NEW] `frontend/src/pages/Analysis.jsx`
+- Phase state machine: `interviewing` → `researching` → `results`
+- **interviewing**: renders `<InterviewChat />`, calls `POST /:id/answer`, advances questions
+- **researching**: renders `<ResearchProgress />`, opens `EventSource` on `GET /:id/research`, then calls analyze + challenge
+- **results**: renders `<ScoreRadar />`, `<EvidencePanel />`, `<RiskCards />`, assumptions section, devil's advocate box, "Generate Full Report" button
+
+#### [NEW] `frontend/src/pages/Report.jsx`
+- Fetches `GET /api/reports/:reportId` on mount
+- Renders `<ReactMarkdown>` for report content
+- Feasibility score badge
+- Devil's Advocate section
+- "Copy Share Link" + Print buttons
+
+---
+
+#### [NEW] `frontend/src/components/IdeaInput/IdeaInput.jsx` + `IdeaInput.css`
+- Large textarea with placeholder
+- Submit button
+- Loading state while API calls run
+
+#### [NEW] `frontend/src/components/InterviewChat/InterviewChat.jsx` + `InterviewChat.css`
+- Chat bubble layout (AI left, user right)
+- Question counter ("Question N of 5")
+- Textarea + submit button
+
+#### [NEW] `frontend/src/components/ResearchProgress/ResearchProgress.jsx` + `ResearchProgress.css`
+- Vertical list of status cards
+- Spinner → checkmark transitions
+- Real-time updates via SSE events
+
+#### [NEW] `frontend/src/components/ScoreRadar/ScoreRadar.jsx`
+- Recharts `RadarChart` with 6 axes
+- Semi-transparent filled radar
+- Prominent overall score display
+
+#### [NEW] `frontend/src/components/EvidencePanel/EvidencePanel.jsx` + `EvidencePanel.css`
+- Two-column layout: RAG Sources | Web Sources
+- Small cards with source name + snippet
+
+#### [NEW] `frontend/src/components/RiskCards/RiskCards.jsx` + `RiskCards.css`
+- Grid layout
+- Colored left border (red/orange/green by severity)
+- Title, description, mitigation per card
+
+#### [NEW] `frontend/src/components/ReportView/ReportView.jsx` + `ReportView.css`
+- Styled wrapper for the markdown report
+- Typography overrides for `ReactMarkdown` output
+
+---
+
+#### [NEW] `frontend/src/hooks/useSession.js`
+- Custom hook for session state management (sessionId, phase, analysisData, etc.)
+
+#### [NEW] `frontend/src/services/api.js`
+- Axios instance with `baseURL: http://localhost:5000`
+- Named exports for every API call: `createSession`, `submitIdea`, `submitAnswer`, `analyzeSession`, `challengeIdea`, `generateReport`, `getReport`
+
+---
+
+#### [NEW] `frontend/vite.config.js`
+- Standard Vite + React config
+
+#### [NEW] `frontend/package.json`
+- Dependencies: react, react-dom, react-router-dom, recharts, react-markdown, axios
+- DevDependencies: vite, @vitejs/plugin-react
+
+#### [NEW] `backend/package.json`
+- Dependencies: express, mongoose, uuid, dotenv, cors, node-fetch, @google/generative-ai
+- scripts: `"start": "node server.js"`, `"dev": "nodemon server.js"`
+
+#### [NEW] `README.md` (root level)
+- Prerequisites, install steps, .env setup, ingest script, dev server commands
+
+---
+
+## Data Flow (End-to-End)
+
+```
+User types idea
+    │
+    ▼
+POST /api/sessions → create session (UUID)
+POST /api/sessions/:id/idea → Gemini structures idea, generates Q1
+    │
+    ▼
+[Interview Loop — up to 5 questions]
+POST /api/sessions/:id/answer → append answer, get next question
+    │
+    ▼
+GET /api/sessions/:id/research (SSE)
+  ├─ RAG: embed query → cosine rank knowledge_chunks → top 5
+  └─ Web: 3 Serper searches → merge results
+    │
+    ▼
+POST /api/sessions/:id/analyze
+  └─ 6 Gemini calls (one per dimension) → scores + reasoning + evidence
+  └─ scoring.service: weighted sum → feasibilityScore
+  └─ extract risks[] + assumptions[]
+    │
+    ▼
+POST /api/sessions/:id/challenge
+  └─ OpenRouter Mistral → devil's advocate text
+    │
+    ▼
+Results page: RadarChart + EvidencePanel + RiskCards + DevilsAdvocate
+    │
+    ▼
+POST /api/sessions/:id/report
+  └─ Gemini → full markdown report
+  └─ Save Report doc → return reportId
+    │
+    ▼
+GET /api/reports/:reportId → shareable report page
+```
+
+---
+
+## Verification Plan
+
+### After Scaffold (Phase 1 — current)
+- Confirm all files exist with correct directory nesting
+- Confirm no code is written yet (pure empty structure)
+
+### After Implementation (Phase 2)
+- `node scripts/ingestKnowledgeBase.js` runs without error and populates `knowledge_chunks`
+- `npm run dev` starts both frontend (port 5173) and backend (port 5000) without errors
+- Full flow test: submit idea → complete interview → see results page → generate report → view report URL
+- Recharts RadarChart renders with real scores
+- SSE progress events display in real time
+
+---
+
+## Open Questions
+
+> [!IMPORTANT]
+> **SSE + POST conflict**: `EventSource` in browsers only supports `GET`. The research endpoint is defined as `POST` in the spec but SSE requires `GET`. **Resolution**: The research endpoint will be implemented as `GET /api/sessions/:id/research` with SSE. The frontend opens `new EventSource('/api/sessions/:id/research')`. This matches the routes file above.
+
+> [!NOTE]
+> **MongoDB Atlas vs Local**: The `.env.example` will show both options. User should set `MONGODB_URI` before running.
+
+> [!NOTE]
+> **Knowledge base ingestion**: Must be run once before starting the backend. The `ingestKnowledgeBase.js` script is idempotent — safe to re-run.

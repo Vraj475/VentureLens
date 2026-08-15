@@ -1,6 +1,22 @@
+// Research Sources data (internal research documents — displayed as "Research Sources" in UI)
+
+export const MOCK_USER = {
+  uid: 'mock-uid-123',
+  email: 'vraj@example.com',
+  displayName: 'Vraj',
+  photoURL: null,
+  settings: {
+    marketFocus: 'India',
+    devilsAdvocate: true,
+  },
+};
+
 export const MOCK_SESSION = {
   sessionId: 'mock-session-123',
+  uid: 'mock-uid-123',
+  sessionTitle: 'Kirana SaaS — WhatsApp Inventory',
   status: 'complete',
+  createdAt: new Date().toISOString(),
   rawIdea:
     'A SaaS platform for small kirana stores in India to manage inventory, billing, and supplier orders using WhatsApp',
   structuredIdea: {
@@ -201,6 +217,159 @@ export const MOCK_SESSION = {
     "1. Vyapar already owns this market. With 10 million users, a Series B war chest, and an established brand, Vyapar can copy any WhatsApp feature you ship within 90 days. You are not disrupting them — you are building a feature they will absorb.\n\n2. Your target customer does not want software. The pen-and-paper kirana owner has run their shop profitably for 20 years without your product. The pain point is real but the urgency to pay for a solution is not. Every demo will end with 'bhai, sochta hoon'.\n\n3. The unit economics do not survive distribution costs. At Rs 299 per month, you need 280 stores to make Rs 1 lakh MRR. Each store requires a physical visit, demo, and handholding during onboarding. Your CAC will be Rs 3,000 minimum which destroys your LTV-to-CAC ratio.\n\n4. WhatsApp Business API is not free. At scale, API message costs and Meta's pricing changes will erode your already thin margins. You are building on a platform you do not control.\n\n5. Regional language voice input is a feature promise you cannot deliver reliably. Gujarati ASR at 71% accuracy means 3 out of 10 voice entries will be wrong. One wrong inventory entry can cost a shop owner money — and they will blame your app.",
 };
 
+export const MOCK_SESSIONS_LIST = [
+  {
+    sessionId: MOCK_SESSION.sessionId,
+    sessionTitle: MOCK_SESSION.sessionTitle,
+    feasibilityScore: MOCK_SESSION.feasibilityScore,
+    createdAt: MOCK_SESSION.createdAt,
+  },
+  {
+    sessionId: 'mock-session-456',
+    sessionTitle: 'AgriTech Drone Monitoring',
+    feasibilityScore: 61,
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    sessionId: 'mock-session-789',
+    sessionTitle: 'D2C Skincare for Men',
+    feasibilityScore: 52,
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+];
+
+const ANALYSIS_SUMMARY =
+  'Your kirana SaaS idea scores 74/100 — strong founder-market fit and a validated problem in a large market. Market opportunity (78) and problem clarity (85) are standout dimensions. Competition (58) and distribution risk are the main concerns. The WhatsApp-native angle is differentiated but not yet defensible against well-funded incumbents like Vyapar.';
+
+export const MOCK_CHAT_MESSAGES = [
+  {
+    id: 'msg-1',
+    type: 'bot-text',
+    content: 'Hi Vraj! Tell me your business idea and we will research it together.',
+    timestamp: '2026-08-10T10:00:00.000Z',
+  },
+  {
+    id: 'msg-2',
+    type: 'user-text',
+    content: MOCK_SESSION.rawIdea,
+    timestamp: '2026-08-10T10:01:00.000Z',
+  },
+  {
+    id: 'msg-3',
+    type: 'bot-text',
+    content: 'Great idea! Let me ask you a few questions to understand it better.',
+    timestamp: '2026-08-10T10:01:30.000Z',
+  },
+  {
+    id: 'msg-4',
+    type: 'options',
+    content: {
+      question: 'What type of product is this?',
+      options: ['SaaS / Software', 'Mobile App', 'Physical Product', 'Marketplace', 'Service Business'],
+    },
+    timestamp: '2026-08-10T10:01:45.000Z',
+  },
+  {
+    id: 'msg-5',
+    type: 'user-text',
+    content: 'SaaS / Software',
+    timestamp: '2026-08-10T10:02:00.000Z',
+  },
+  {
+    id: 'msg-6',
+    type: 'bot-text',
+    content: 'Who is your primary customer and how do they currently handle this problem?',
+    timestamp: '2026-08-10T10:02:15.000Z',
+  },
+  {
+    id: 'msg-7',
+    type: 'user-text',
+    content: MOCK_SESSION.interviewAnswers[0].answer,
+    timestamp: '2026-08-10T10:02:45.000Z',
+  },
+  {
+    id: 'msg-8',
+    type: 'options',
+    content: {
+      question: 'Which market are you targeting first?',
+      options: ['India — Tier 1 cities', 'India — Tier 2 and 3 cities', 'Global', 'Specific region'],
+    },
+    timestamp: '2026-08-10T10:03:00.000Z',
+  },
+  {
+    id: 'msg-9',
+    type: 'user-text',
+    content: 'India — Tier 2 and 3 cities',
+    timestamp: '2026-08-10T10:03:20.000Z',
+  },
+  {
+    id: 'msg-10',
+    type: 'bot-text',
+    content: 'Name one or two existing alternatives your customer might already use.',
+    timestamp: '2026-08-10T10:03:35.000Z',
+  },
+  {
+    id: 'msg-11',
+    type: 'user-text',
+    content: MOCK_SESSION.interviewAnswers[3].answer,
+    timestamp: '2026-08-10T10:04:00.000Z',
+  },
+  {
+    id: 'msg-12',
+    type: 'bot-text',
+    content: 'What gives you a specific advantage here — your experience, network, or technical edge?',
+    timestamp: '2026-08-10T10:04:15.000Z',
+  },
+  {
+    id: 'msg-13',
+    type: 'user-text',
+    content: MOCK_SESSION.interviewAnswers[4].answer,
+    timestamp: '2026-08-10T10:04:45.000Z',
+  },
+  {
+    id: 'msg-14',
+    type: 'bot-text',
+    content: 'Perfect. Researching your idea now...',
+    timestamp: '2026-08-10T10:05:00.000Z',
+  },
+  {
+    id: 'msg-15',
+    type: 'chart',
+    content: { analysis: MOCK_SESSION.analysis, feasibilityScore: MOCK_SESSION.feasibilityScore },
+    timestamp: '2026-08-10T10:06:00.000Z',
+  },
+  {
+    id: 'msg-16',
+    type: 'bot-text',
+    content: ANALYSIS_SUMMARY,
+    timestamp: '2026-08-10T10:06:30.000Z',
+  },
+  {
+    id: 'msg-17',
+    type: 'risk-cards',
+    content: MOCK_SESSION.risks,
+    timestamp: '2026-08-10T10:07:00.000Z',
+  },
+  {
+    id: 'msg-18',
+    type: 'assumptions',
+    content: MOCK_SESSION.assumptions,
+    timestamp: '2026-08-10T10:07:30.000Z',
+  },
+  {
+    id: 'msg-19',
+    type: 'devil',
+    content: MOCK_SESSION.devilsAdvocate,
+    timestamp: '2026-08-10T10:08:00.000Z',
+  },
+  {
+    id: 'msg-20',
+    type: 'download',
+    content: { sessionId: 'mock-session-123', reportId: 'mock-report-123' },
+    timestamp: '2026-08-10T10:08:30.000Z',
+  },
+];
+
 export const MOCK_REPORT_MARKDOWN = `
 ## Executive Summary
 
@@ -244,3 +413,32 @@ Two of four key assumptions are not supported by available evidence: WhatsApp as
 
 The idea has genuine commercial merit. The founder advantage is real and rare. The market is large. The risks are manageable but the competition risk is severe and must be addressed with a tight niche focus rather than a broad product strategy. Do not build everything. Go deep on WhatsApp onboarding in one city first.
 `;
+
+export const INTERVIEW_QUESTIONS = [
+  {
+    type: 'options',
+    content: {
+      question: 'What type of product is this?',
+      options: ['SaaS / Software', 'Mobile App', 'Physical Product', 'Marketplace', 'Service Business'],
+    },
+  },
+  {
+    type: 'bot-text',
+    content: 'Who is your primary customer and how do they currently handle this problem?',
+  },
+  {
+    type: 'options',
+    content: {
+      question: 'Which market are you targeting first?',
+      options: ['India — Tier 1 cities', 'India — Tier 2 and 3 cities', 'Global', 'Specific region'],
+    },
+  },
+  {
+    type: 'bot-text',
+    content: 'Name one or two existing alternatives your customer might already use.',
+  },
+  {
+    type: 'bot-text',
+    content: 'What gives you a specific advantage here — your experience, network, or technical edge?',
+  },
+];

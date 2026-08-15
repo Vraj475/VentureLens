@@ -1,0 +1,31 @@
+.bot-text-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.bot-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bot-text-bubble {
+  background: var(--surface);
+  border-radius: 4px 16px 16px 16px;
+  padding: 12px 16px;
+  max-width: 72%;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.7;
+}

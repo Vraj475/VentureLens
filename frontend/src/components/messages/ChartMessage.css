@@ -1,0 +1,59 @@
+.chart-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.chart-card {
+  max-width: 480px;
+  width: 100%;
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(108, 99, 255, 0.2);
+}
+
+.chart-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.chart-score-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.chart-score-value {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.chart-score-value--low {
+  color: var(--danger);
+}
+
+.chart-score-value--mid {
+  color: var(--warning);
+}
+
+.chart-score-value--high {
+  color: var(--success);
+}
+
+.chart-score-max {
+  color: var(--text-muted);
+  font-size: 20px;
+}
+
+.chart-radar-wrap {
+  width: 100%;
+  height: 260px;
+}

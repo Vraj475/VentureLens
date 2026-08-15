@@ -1,0 +1,140 @@
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  height: 100vh;
+  background: var(--bg);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+}
+
+.sidebar-new-btn {
+  margin: 12px 16px;
+  background: var(--accent);
+  color: var(--text);
+  border: none;
+  border-radius: 10px;
+  padding: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.sidebar-new-btn:hover {
+  opacity: 0.88;
+}
+
+.sidebar-sessions {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 0 8px;
+}
+
+.sidebar-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 16px 8px 8px;
+}
+
+.sidebar-session-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 2px;
+}
+
+.sidebar-session-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sidebar-session-item--active {
+  background: var(--accent-dim);
+}
+
+.sidebar-session-title {
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-session-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sidebar-score-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.sidebar-score-badge--high {
+  background: rgba(76, 175, 80, 0.15);
+  color: var(--success);
+}
+
+.sidebar-score-badge--mid {
+  background: rgba(255, 152, 0, 0.15);
+  color: var(--warning);
+}
+
+.sidebar-score-badge--low {
+  background: rgba(244, 67, 54, 0.15);
+  color: var(--danger);
+}
+
+.sidebar-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.sidebar-bottom:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sidebar-avatar {
+  width: 36px;
+  height: 36px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sidebar-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sidebar-user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sidebar-user-email {
+  font-size: 11px;
+  color: var(--text-muted);
+}

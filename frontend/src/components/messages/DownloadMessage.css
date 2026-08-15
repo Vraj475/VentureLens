@@ -1,0 +1,39 @@
+.download-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.download-content {
+  max-width: 520px;
+}
+
+.download-text {
+  background: var(--surface);
+  border-radius: 4px 16px 16px 16px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.download-btn {
+  background: var(--accent);
+  color: var(--text);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.download-btn:hover {
+  opacity: 0.88;
+}

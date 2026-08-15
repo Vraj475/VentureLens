@@ -1,0 +1,41 @@
+.options-message {
+  margin-bottom: 12px;
+}
+
+.options-message-inner {
+  width: 100%;
+}
+
+.options-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  margin-left: 44px;
+}
+
+.options-chip {
+  background: var(--surface2);
+  border: 1px solid rgba(108, 99, 255, 0.4);
+  color: var(--text);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.options-chip:hover:not(:disabled) {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+.options-chip--selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.options-chip:disabled {
+  cursor: default;
+  opacity: 0.7;
+}

@@ -1,0 +1,21 @@
+Market Sizing for Indian Startups: A Practical Guide
+
+Sizing a market correctly is one of the highest-leverage skills a founder can develop. An accurate market size estimate gives you credibility with investors, helps prioritize product development, and forces you to confront whether the opportunity is large enough to build a venture-scale business. Here is a practical guide to market sizing with a focus on the Indian context.
+
+Bottom-Up Calculation: The Founder's Method
+The most credible market sizing method for early-stage founders is bottom-up: start from the number of addressable customers and multiply by the average revenue per customer. Formula: Market Size = (Number of customers) x (Annual Revenue Per Customer). Example for a B2B payroll SaaS targeting Indian SMBs: India has approximately 63 million registered MSMEs as of 2024. About 6% (3.8 million) have 10-200 employees and can afford payroll software. At ₹3,000/month average contract value, the SAM = 3.8 million x ₹36,000/year = ₹13,680 crore (approximately $1.6 billion). This is a credible, large market.
+
+India-Specific Data Points (2024)
+Internet users in India: 900 million+. Smartphone users: 750 million+. UPI transactions: 13 billion+ per month. Active credit/debit card users: 900 million+. Number of registered companies: 2.5 million+. SMBs with formal GST registration: 14 million+. Average Indian SaaS ARPU: ₹18,000-₹60,000/year for SMB-focused tools. Enterprise SaaS deals: ₹5 lakh-₹2 crore/year. E-commerce GMV in India 2024: approximately $60 billion. EdTech market 2024: approximately $7 billion. HealthTech market 2024: approximately $10 billion. FinTech market 2024: approximately $31 billion.
+
+Industry Report Interpretation
+Analysts from Redseer, Inc42, NASSCOM, and Bain & Company regularly publish India-specific market reports. When reading these reports, look for: (1) the year the data was collected (often lagged by 1-2 years), (2) whether it measures revenue, GMV, or total spending (they differ significantly), (3) whether the figure represents the current market or a projected future market (treat projections with skepticism). Verify claims from two independent sources when possible.
+
+Proxy Metrics for Market Sizing
+When direct data is unavailable, use proxy metrics: Job postings (LinkedIn, Naukri) for a sector indicate market growth. App download rankings (Google Play Store India) indicate consumer market engagement. GST filing data by industry category indicates business activity. Funding announcements in a sector indicate investor confidence in market size. Google Trends data indicates search interest and potential market need.
+
+Willingness to Pay in India
+Indian consumers are highly price-sensitive compared to Western markets, but this is changing. Willingness to pay increases significantly when: ROI is clear and demonstrable, there is social proof from trusted peers or large customers, the product replaces a clear cost (audit fees, manual labor, paper-based processes), and there is a free trial that demonstrates value before payment. B2B buyers in India are more rational about ROI than B2C buyers but have longer evaluation cycles. Indian SMB decision-makers often make purchase decisions based on referrals from trade associations, WhatsApp groups, and industry peers rather than digital ads.
+
+Common Sizing Mistakes
+Founders frequently make these errors: (1) Citing a global market number for a local product ("The global CRM market is $96 billion"). (2) Using a TAM as if it were a SOM. (3) Assuming 10% market share in year one. (4) Ignoring the cost of customer acquisition in the market size estimate. (5) Confusing addressable market (who could buy) with obtainable market (who will buy given your go-to-market capacity and competitive context).

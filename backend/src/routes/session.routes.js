@@ -1,44 +1,14 @@
-import { Router } from 'express';
-import authMiddleware from '../middleware/auth.middleware.js';
-import Session from '../models/Session.model.js';
-
-const router = Router();
+const router = require('express').Router();
+const authMiddleware = require('../middleware/auth.middleware');
+const ctrl = require('../controllers/session.controller');
 
 router.use(authMiddleware);
+router.post('/', ctrl.createSession);
+router.get('/:id', ctrl.getSession);
+router.post('/:id/idea', ctrl.submitIdea);
+router.post('/:id/answer', ctrl.submitAnswer);
+router.post('/:id/analyze', ctrl.runAnalysis);
+router.post('/:id/challenge', ctrl.challengeSession);
+router.post('/:id/report', ctrl.generateReport);
 
-router.get('/list', async (req, res, next) => {
-  try {
-    const sessions = await Session.find({ uid: req.user.uid })
-      .select('sessionId sessionTitle feasibilityScore createdAt')
-      .sort({ createdAt: -1 });
-
-    res.json(sessions);
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.delete('/all', async (req, res, next) => {
-  try {
-    await Session.deleteMany({ uid: req.user.uid });
-    res.json({ success: true });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.post('/', async (req, res, next) => {
-  try {
-    const { v4: uuidv4 } = await import('uuid');
-    const session = await Session.create({
-      sessionId: uuidv4(),
-      uid: req.user.uid,
-      status: 'idle',
-    });
-    res.json({ sessionId: session.sessionId });
-  } catch (error) {
-    next(error);
-  }
-});
-
-export default router;
+module.exports = router;

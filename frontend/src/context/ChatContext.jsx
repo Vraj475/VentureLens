@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useState } from 'react';
-import { MOCK_CHAT_MESSAGES, MOCK_SESSION } from '../data/mockData.js';
 
 const ChatContext = createContext(null);
 
@@ -23,6 +22,10 @@ export function ChatProvider({ children }) {
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
+  // Sources availability state (Changes 2A & 2B)
+  const [sourcesAvailable, setSourcesAvailable] = useState(false);
+  const [sessionSources, setSessionSources] = useState({ ragResults: [], webResults: [] });
+
   const addMessage = useCallback((messageObj) => {
     setMessages((prev) => [
       ...prev,
@@ -32,6 +35,11 @@ export function ChatProvider({ children }) {
         timestamp: messageObj.timestamp || new Date().toISOString(),
       },
     ]);
+  }, []);
+
+  // Change 6 — removeMessage by id
+  const removeMessage = useCallback((id) => {
+    setMessages((prev) => prev.filter((m) => m.id !== id));
   }, []);
 
   const removeTyping = useCallback(() => {
@@ -55,6 +63,12 @@ export function ChatProvider({ children }) {
     setSourcesOpen(false);
   }, []);
 
+  // Change 2B — markSourcesReady
+  const markSourcesReady = useCallback((sources) => {
+    setSourcesAvailable(true);
+    setSessionSources(sources);
+  }, []);
+
   const startNewSession = useCallback(() => {
     const newId = `session-${Date.now()}`;
     setActiveSessionId(newId);
@@ -62,22 +76,20 @@ export function ChatProvider({ children }) {
     setMessages([{ ...GREETING, id: 'greeting', timestamp: new Date().toISOString() }]);
     setInputLocked(false);
     setSourcesOpen(false);
+    setSourcesAvailable(false);
+    setSessionSources({ ragResults: [], webResults: [] });
   }, []);
 
   const loadSession = useCallback((sessionId) => {
     setActiveSessionId(sessionId);
-    if (sessionId === MOCK_SESSION.sessionId) {
-      setActiveSessionTitle(MOCK_SESSION.sessionTitle);
-      setMessages(MOCK_CHAT_MESSAGES);
-      setInputLocked(true);
-    } else {
-      const session = sessions.find((s) => s.sessionId === sessionId);
-      setActiveSessionTitle(session?.sessionTitle || 'Past Analysis');
-      setMessages([{ ...GREETING, timestamp: new Date().toISOString() }]);
-      setInputLocked(false);
-    }
+    const session = sessions.find((s) => s.sessionId === sessionId);
+    setActiveSessionTitle(session?.sessionTitle || 'Past Analysis');
+    setMessages([{ ...GREETING, timestamp: new Date().toISOString() }]);
+    setInputLocked(false);
     setSourcesOpen(false);
     setProfileOpen(false);
+    setSourcesAvailable(false);
+    setSessionSources({ ragResults: [], webResults: [] });
   }, [sessions]);
 
   const setSessionsList = useCallback((list) => {
@@ -89,50 +101,59 @@ export function ChatProvider({ children }) {
     startNewSession();
   }, [startNewSession]);
 
+  // Change 6 — revealAnalysisSequence rewritten to accept full data object
+  // and call markSourcesReady before the reveal sequence begins
   const revealAnalysisSequence = useCallback(
-    async (analysisData, showDevil = true) => {
-      addTyping();
+    async (data) => {
+      const {
+        analysis,
+        feasibilityScore,
+        risks,
+        assumptions,
+        devilsAdvocate,
+        ragResults,
+        webResults,
+      } = data;
+
+      // Immediately mark sources ready so the Sources button appears
+      markSourcesReady({
+        ragResults: ragResults || [],
+        webResults: webResults || [],
+      });
+
+      // Sequential reveal with delays
       await delay(1500);
-      removeTyping();
       addMessage({
         type: 'chart',
-        content: {
-          analysis: analysisData.analysis,
-          feasibilityScore: analysisData.feasibilityScore,
-        },
+        content: { analysis, feasibilityScore },
       });
 
       await delay(1200);
-      addTyping();
+      addMessage({
+        type: 'bot-text',
+        content: 'Here is the full breakdown across all dimensions.',
+      });
+
       await delay(1000);
-      removeTyping();
-      addMessage({ type: 'risk-cards', content: analysisData.risks });
+      addMessage({ type: 'risk-cards', content: risks });
 
       await delay(900);
-      addTyping();
-      await delay(800);
-      removeTyping();
-      addMessage({ type: 'assumptions', content: analysisData.assumptions });
+      addMessage({ type: 'assumptions', content: assumptions });
 
-      if (showDevil) {
+      if (devilsAdvocate) {
         await delay(800);
-        addTyping();
-        await delay(800);
-        removeTyping();
-        addMessage({ type: 'devil', content: analysisData.devilsAdvocate });
+        addMessage({ type: 'devil', content: devilsAdvocate });
       }
 
       await delay(500);
       addMessage({
         type: 'download',
-        content: {
-          sessionId: activeSessionId || MOCK_SESSION.sessionId,
-          reportId: 'mock-report-123',
-        },
+        content: { sessionId: activeSessionId },
       });
+
       unlockInput();
     },
-    [activeSessionId, addMessage, addTyping, removeTyping, unlockInput],
+    [activeSessionId, addMessage, markSourcesReady, unlockInput],
   );
 
   return (
@@ -146,6 +167,12 @@ export function ChatProvider({ children }) {
         inputLocked,
         sourcesOpen,
         profileOpen,
+        // Change 2C — expose new state and function
+        sourcesAvailable,
+        sessionSources,
+        markSourcesReady,
+        // Change 6 — expose removeMessage
+        removeMessage,
         setSessionsList,
         startNewSession,
         loadSession,

@@ -17,12 +17,11 @@ function formatDate(iso) {
 }
 
 function Sidebar({ onNewAnalysis }) {
-  const { userProfile } = useAuth();
+  const { currentUser, userProfile } = useAuth();
   const { sessions, activeSessionId, startNewSession, loadSession, toggleProfile } = useChat();
 
-  const displayName = userProfile?.displayName || 'User';
-  const email = userProfile?.email || '';
-  const initial = displayName.charAt(0).toUpperCase();
+  const displayEmail = currentUser?.email || userProfile?.email || 'User';
+  const initial = (currentUser?.email?.[0] || userProfile?.email?.[0] || 'U').toUpperCase();
 
   return (
     <aside className="sidebar">
@@ -73,14 +72,13 @@ function Sidebar({ onNewAnalysis }) {
       >
         <div className="sidebar-avatar">
           {userProfile?.photoURL ? (
-            <img src={userProfile.photoURL} alt={displayName} />
+            <img src={userProfile.photoURL} alt={displayEmail} />
           ) : (
             initial
           )}
         </div>
         <div>
-          <div className="sidebar-user-name">{displayName}</div>
-          <div className="sidebar-user-email">{email}</div>
+          <div className="sidebar-user-name">{displayEmail}</div>
         </div>
       </div>
     </aside>

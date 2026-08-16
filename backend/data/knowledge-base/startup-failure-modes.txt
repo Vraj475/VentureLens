@@ -1,0 +1,27 @@
+Why Startups Fail: Evidence-Based Failure Modes
+
+Understanding why startups fail is as important as knowing what makes them succeed. CB Insights analyzed over 300 failed startups and identified the most common root causes of failure. This knowledge is essential for founders to test the most dangerous assumptions first rather than building features nobody wants.
+
+1. No Market Need (42% of failures)
+The single most common reason startups fail is that they build something for which there is insufficient demand. This happens when founders fall in love with a solution rather than a problem, when they talk to too few potential customers before building, or when they confuse a feature request with a market need. The classic mistake: "Everyone I talked to said they loved the idea." In reality, people say they like ideas to be polite. The test is whether they would pay for it, switch from their current solution, or refer others to it.
+
+2. Running Out of Cash (29% of failures)
+Many startups run out of cash not because their idea was bad, but because they mismanaged burn rate, underestimated how long it takes to reach profitability, or failed to raise their next round. Key signals of cash risk: monthly burn exceeds 10% of total capital raised, runway drops below 6 months without a clear fundraise plan, CAC is rising while LTV is flat or declining.
+
+3. Wrong Team (23% of failures)
+Investors often say they invest in teams more than ideas. A wrong team mismatch includes: a solo technical founder without any sales/marketing capability, a founding team with no domain expertise in the problem they're solving, co-founders with misaligned incentives or communication styles, and teams that cannot attract talent because of poor culture or equity structures.
+
+4. Beaten by Competition (19% of failures)
+Many startups fail by ignoring competition during the ideation phase and being surprised by well-funded incumbents or fast followers. In India, the risk of large Indian conglomerates (Tata, Reliance) or well-funded competitors entering a space that shows early traction is very real. Differentiation must be built into the core product architecture, not added as a feature later.
+
+5. Pricing and Cost Issues (18% of failures)
+Pricing too low erodes margins and signals low value. Pricing too high reduces conversion. Many Indian startups underprice their SaaS products (charging ₹999/month when the value delivered is 10x that) because founders fear Indian customers won't pay. Research consistently shows that if the ROI is clear, Indian SMBs will pay. Freemium models that don't convert to paid are a common Indian startup failure pattern.
+
+6. Poor Product Quality (17% of failures)
+Building a product that is too buggy, too slow, or too confusing to use kills retention. In India's mobile-first market, app performance on mid-range Android devices and 4G networks is critical. Many founders build for their own high-end devices and discover the product breaks on the devices their customers actually use.
+
+7. Lack of Business Model (17% of failures)
+Some startups grow users but never find a way to monetize sustainably. This is particularly common in consumer apps in India where users are accustomed to free services. Without a clear revenue model tested early, startups burn through investor capital trying to find monetization after the fact.
+
+8. India-Specific Failure Patterns
+Beyond the global patterns, India-specific failure modes include: overestimating digital payment adoption in Tier 2+ cities, underestimating the role of trust and relationship in B2B sales, building English-only products in markets that speak Hindi or regional languages, assuming high growth rates will automatically attract follow-on funding, and failing to account for the extended Indian enterprise sales cycle (6-18 months for companies with 500+ employees).

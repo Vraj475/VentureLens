@@ -1,0 +1,18 @@
+TAM, SAM, SOM: The Market Sizing Framework for Startups
+
+Market sizing is one of the most frequently misunderstood tasks in early-stage startup building. Investors and founders both cite "huge market" as a reason to build something, yet most market size estimates are either wildly optimistic or poorly calculated. The TAM-SAM-SOM framework provides a structured, three-level approach to estimating market opportunity in a defensible and investor-credible way.
+
+Total Addressable Market (TAM)
+TAM is the total revenue opportunity available if a product achieved 100% market share. It represents the maximum theoretical ceiling. TAM is most commonly calculated using a top-down approach: start with published industry reports (Statista, IBISWorld, McKinsey, NASSCOM), find the total annual spending or revenue of the industry, and cite it as TAM. Example: "The global HR software market is $22 billion annually." TAM should be genuinely large — at least $1 billion — for a venture-scale business. Anything below $500M TAM typically cannot support a VC-funded startup reaching the fund return requirements.
+
+Serviceable Addressable Market (SAM)
+SAM is the portion of TAM that your product can actually serve given your current business model, geography, language, pricing, and distribution. SAM requires filtering the TAM. Example: If TAM is the global HR software market at $22B, but you're building an HR tool specifically for Indian SMBs with fewer than 200 employees, your SAM might be the Indian SMB HR software segment worth approximately $800 million annually. SAM should be calculated using an industry sub-segment or by applying multiple filters to the TAM. Investors care more about SAM than TAM because it reflects realistic opportunity.
+
+Serviceable Obtainable Market (SOM)
+SOM is the slice of SAM you can realistically capture in the next 3-5 years given your go-to-market capacity, competition, sales cycle length, and capital. SOM is where most founders either get unrealistic (claiming 10% of a billion-dollar market in year 1) or overly conservative (claiming less than 0.1% of a tiny market). For early-stage SaaS, a reasonable SOM estimate is 1-5% of SAM in years 1-3. For well-funded startups with strong distribution, 5-15% of SAM is defensible. Example: "We will capture 3% of India's SMB HR software market, representing $24M ARR."
+
+Bottom-Up Sizing: The More Credible Method
+While top-down sizing uses industry reports, bottom-up sizing starts from unit-level assumptions. Formula: SOM = (Number of target customers) x (Annual revenue per customer). Example for a B2B SaaS: India has approximately 63 million registered MSMEs. About 7% (4.4 million) have more than 10 employees and can afford software. Of these, you target manufacturing SMBs — roughly 800,000. At 1% market penetration in year 3, you reach 8,000 customers paying ₹4,000/month = ₹384 crore ARR ($46M). This is far more defensible than quoting a global industry figure.
+
+What Reasonable SOM Percentages Look Like
+For seed-stage startups (year 1-2): 0.1% to 1% of SAM is realistic. For Series A startups (year 2-4): 1% to 5% of SAM. For scaled startups (Series B+): 5% to 20% of SAM. Any projection of capturing more than 20% of a market within 5 years requires either monopoly dynamics, network effects, or extraordinary capital deployment. Indian SaaS benchmarks: Average ARR per customer for Indian SMB-focused SaaS is ₹50,000–₹3,00,000 annually. Enterprise SaaS deals often start at ₹5 lakh–₹25 lakh per year.

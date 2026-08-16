@@ -1,0 +1,21 @@
+Porter's Five Forces: Analyzing Industry Attractiveness
+
+Developed by Harvard Business School professor Michael E. Porter in 1979, the Five Forces framework is the gold standard for analyzing the competitive intensity and profitability potential of any industry. Unlike SWOT analysis (which looks at internal factors), Porter's framework examines the structural forces that determine how profit is distributed among industry participants. For startups, understanding these forces before entering a market can be the difference between building a defensible business and entering a commoditized race to zero.
+
+Force 1: Threat of New Entrants
+When barriers to entry are low, profitable industries attract new competitors quickly, eroding margins. High barriers include: high capital requirements (semiconductor manufacturing), strong brand identity (Coca-Cola), network effects (WhatsApp), proprietary technology, regulatory approvals (pharmaceuticals), and switching costs. For software startups, barriers to entry are typically low — anyone can build an app — which means differentiation through brand, data, or network effects becomes critical. A favorable signal is when incumbents have high switching costs already built in.
+
+Force 2: Bargaining Power of Suppliers
+Suppliers have high bargaining power when: there are few substitutes for the supplier's input, switching suppliers is costly or risky, the supplier can credibly threaten to integrate forward (sell directly), and the buying industry is not a significant customer for the supplier. For SaaS startups, key suppliers are cloud infrastructure providers (AWS, GCP, Azure). Vendor lock-in through proprietary APIs is a real risk. A favorable signal is when multiple suppliers compete and inputs are commoditized.
+
+Force 3: Bargaining Power of Buyers
+Buyers have high bargaining power when: they purchase in large volumes, the product is standardized or undifferentiated, switching costs are low, buyers can credibly threaten to integrate backward (build their own solution), and buyers have full price transparency. In B2B SaaS, large enterprise buyers often negotiate significant discounts, require custom features, and have procurement teams that extend sales cycles. SMB buyers have less power individually but can churn easily. A favorable signal is a fragmented buyer base with high switching costs.
+
+Force 4: Threat of Substitutes
+Substitutes are products or services from outside the industry that serve the same function. The threat is high when the price-performance tradeoff of substitutes is favorable, switching costs are low, and buyers have a high propensity to substitute. For example, a B2B SaaS project management tool faces substitution threat from spreadsheets (free, familiar), WhatsApp groups (zero cost), and physical notebooks. A favorable signal is when substitutes are significantly inferior in performance or convenience.
+
+Force 5: Industry Rivalry
+Intense rivalry among existing competitors drives down prices and profitability. Rivalry is intense when: there are many competitors of roughly equal size, the industry grows slowly (competitors fight for share), products are undifferentiated, exit barriers are high (specialized assets), and fixed costs are high relative to variable costs. The Indian fintech, edtech, and food delivery sectors exhibit intense rivalry, explaining why profitability remains elusive despite massive funding. A favorable signal is a concentrated market with differentiated products and rational pricing behavior.
+
+Interpreting Five Forces for Startup Decisions
+For a startup assessing industry attractiveness: count how many forces work in your favor. If four or five forces are unfavorable, the industry is structurally unattractive and disruption from outside the industry is unlikely to create durable margins. If two or three forces are favorable — especially weak supplier and buyer power combined with high entry barriers — the industry can be very profitable. Startups can shift forces in their favor through proprietary technology, exclusive partnerships, network effects, and regulatory navigation.

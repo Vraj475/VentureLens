@@ -1,0 +1,27 @@
+Customer Discovery: How to Validate Startup Ideas Before Building
+
+Customer discovery is the systematic process of learning whether your assumptions about customers, problems, and solutions are correct before investing in building. Popularized by Steve Blank and operationalized by Rob Fitzpatrick's "The Mom Test," customer discovery is the most important thing a pre-product founder can do. Most startup failures can be traced back to insufficient or biased customer discovery.
+
+The Mom Test Principles
+Rob Fitzpatrick's "The Mom Test" provides rules for asking customer questions that don't produce false positives. The name comes from the idea that even your mom would lie to you to protect your feelings if you ask questions the wrong way. The three core rules: (1) Talk about their life, not your idea. (2) Ask about specific past behaviors, not hypothetical future behaviors. (3) Listen more than you talk, and never pitch during discovery. Bad question: "Would you use an app that helps you track your fitness?" (hypothetical, leading). Good question: "How do you currently track your fitness? Show me the last time you did it. What happened?" Specific, behavioral, non-leading.
+
+Problem Interviews
+Problem interviews are conducted before you have a product or even a clear solution in mind. The goal is to understand the customer's world deeply: what pains they experience, how frequently those pains occur, how they currently solve them, and how much they spend (in time and money) on those solutions. Key questions: "What's the hardest part about [the area you're exploring]?" "Can you walk me through the last time that happened?" "What have you already tried?" "What would a perfect solution look like?" Conduct a minimum of 20 problem interviews across your target customer segment before drawing conclusions.
+
+Solution Interviews
+Once you have a hypothesis about the solution, solution interviews test whether your proposed solution addresses the validated problem. Show a mockup, prototype, or even a hand-drawn sketch. Key questions: "Does this solve the problem you described?" "What's missing?" "What would you change?" "Would you be willing to pay for this? How much?" The goal is to get specific feedback on your solution concept without overselling it.
+
+Landing Page Tests
+A landing page with a clear value proposition, a few feature descriptions, and a waitlist signup button can validate demand quickly. Benchmark: a 20%+ email conversion rate (visitors who sign up) suggests strong interest. Drive traffic via Facebook/Instagram ads (₹5,000–₹20,000 budget is sufficient for meaningful data), Google Ads on relevant keywords, or organic social media posts. In India, WhatsApp broadcast lists can be more effective than email for waitlist follow-up.
+
+Fake Door Tests
+A fake door test places a button or link for a feature that doesn't exist yet. When users click it, they see a message like "Coming soon — join the waitlist." This measures genuine intent to use a feature without building it. Used extensively by product teams at Dropbox, Airbnb, and many Indian startups to prioritize roadmap decisions.
+
+Concierge MVP and Wizard of Oz MVP
+A Concierge MVP delivers the promised outcome manually (using humans rather than software) to a small number of customers. Example: instead of building an AI-powered job application tool, you manually review and improve resumes for 10 customers. This validates the value proposition without building technology. A Wizard of Oz MVP gives the appearance of automation while humans do the work behind the scenes. Both methods help validate willingness to pay with minimal upfront investment.
+
+Letter of Intent (LOI) Collection
+In B2B contexts, asking potential customers to sign a non-binding Letter of Intent is one of the strongest forms of validation. An LOI indicates that the customer finds the proposed solution compelling enough to put their name on paper, even if they're not paying yet. LOIs are commonly used to support fundraising conversations: "We have 7 LOIs from companies representing ₹85 lakh in ARR if we can deliver the product by Q3."
+
+Avoiding Confirmation Bias
+The biggest threat to good customer discovery is confirmation bias: hearing what you want to hear. Warning signs: all your interviews support your hypothesis, interviewees are mostly friends or family, you're doing more talking than listening, and you're asking questions that lead to "yes" answers. Countermeasures: record interviews (with permission) and review them later, have a skeptical co-founder attend, share verbatim interview notes with your team, and actively seek out customers who are skeptical or currently satisfied with alternatives.

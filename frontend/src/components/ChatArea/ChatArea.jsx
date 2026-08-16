@@ -10,6 +10,7 @@ function ChatArea({ onSend, onOptionSelect }) {
     activeSessionTitle,
     inputLocked,
     toggleSources,
+    sourcesAvailable,
   } = useChat();
   const messagesEndRef = useRef(null);
 
@@ -23,9 +24,11 @@ function ChatArea({ onSend, onOptionSelect }) {
         <h1 className="chat-header-title">
           {activeSessionTitle || 'VentureLens'}
         </h1>
-        <button type="button" className="chat-sources-btn" onClick={toggleSources}>
-          📚 Sources
-        </button>
+        {sourcesAvailable && (
+          <button type="button" className="chat-sources-btn" onClick={toggleSources}>
+            📚 Sources
+          </button>
+        )}
       </header>
 
       <div className="chat-messages">

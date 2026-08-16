@@ -1,9 +1,10 @@
-import { MOCK_SESSION } from '../../data/mockData.js';
+import { useChat } from '../../context/ChatContext';
 import './SourcesPanel.css';
 
 function SourcesPanel({ isOpen, onClose }) {
-  const researchSources = MOCK_SESSION.ragResults;
-  const webResults = MOCK_SESSION.webResults;
+  const { sessionSources } = useChat();
+  const researchSources = sessionSources.ragResults;
+  const webResults = sessionSources.webResults;
 
   return (
     <aside className={`sources-panel ${isOpen ? 'sources-panel--open' : ''}`}>
@@ -31,16 +32,8 @@ function SourcesPanel({ isOpen, onClose }) {
         <div className="sources-section-label">Web Sources</div>
         {webResults.map((source, index) => (
           <div key={index} className="sources-item">
-            <div className="sources-item-title">{source.title}</div>
-            <a
-              className="sources-item-link"
-              href={source.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {source.url}
-            </a>
-            <div className="sources-item-detail">{source.snippet}</div>
+            <div className="sources-item-title">{source.query}</div>
+            <div className="sources-item-detail">{source.content}</div>
           </div>
         ))}
       </div>

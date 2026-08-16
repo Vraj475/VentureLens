@@ -1,0 +1,30 @@
+Unit Economics Fundamentals for Startup Founders
+
+Unit economics are the direct revenues and costs associated with a particular business model on a per-unit basis. Understanding unit economics tells you whether each customer or transaction makes you money, how long it takes to recover your acquisition costs, and whether your business can ever become profitable at scale. Investors scrutinize unit economics more than almost any other metric at Series A and beyond.
+
+Customer Acquisition Cost (CAC)
+CAC is the total cost of acquiring one new paying customer. Formula: CAC = Total Sales and Marketing Spend / Number of New Customers Acquired (in the same period). Example: If you spend ₹10 lakh on marketing and sales in a quarter and acquire 200 new customers, CAC = ₹5,000. CAC should include all marketing spend (ads, content, events), sales team salaries and commissions, and any sales tools or software. Blended CAC mixes paid and organic channels; paid CAC isolates only paid channel spend. Track both. CAC benchmarks for Indian SaaS: SMB-focused (outbound + digital marketing): ₹8,000-₹40,000. Mid-market (SDR + AE motion): ₹1,50,000-₹5,00,000. Enterprise (field sales + long cycles): ₹5,00,000+.
+
+Customer Lifetime Value (LTV)
+LTV is the total revenue a company expects to generate from a customer over the entire relationship. For subscription businesses: LTV = (Average Monthly Revenue Per Customer) / (Monthly Churn Rate). Example: ₹5,000/month ARPU with 3% monthly churn = LTV of ₹1,67,000. For transactional businesses: LTV = (Average Transaction Value) x (Average Number of Transactions per Year) x (Average Customer Lifetime in Years). In India, customer lifetime for SMB SaaS averages 2-3 years due to higher churn than Western markets. Enterprise contracts are typically 3-5 years with annual renewals.
+
+LTV:CAC Ratio
+The LTV:CAC ratio is the single most important unit economics metric. It measures the return on investment of customer acquisition. Minimum healthy ratio: 3:1 (for every rupee spent on acquisition, you earn ₹3 back over the customer's lifetime). Excellent ratio: 5:1 or higher. Below 1:1 means you're destroying value with every customer acquired. The ratio must be interpreted together with payback period: a 5:1 ratio means nothing if payback takes 5 years. Target payback period for SaaS: 12-18 months for healthy businesses.
+
+Payback Period
+Payback period is the number of months it takes to recover the CAC from gross profit. Formula: Payback Period = CAC / (Monthly Gross Profit per Customer). Example: CAC of ₹20,000, monthly revenue of ₹4,000, 70% gross margin = monthly gross profit of ₹2,800. Payback period = ₹20,000 / ₹2,800 = 7.1 months. In India, payback periods below 12 months are considered excellent. Above 24 months creates significant cash flow strain and funding dependency.
+
+Churn Rate
+Monthly churn rate is the percentage of customers who cancel in a given month. Formula: Monthly Churn Rate = Customers Lost in Month / Customers at Start of Month. Benchmarks for Indian SaaS: SMB-focused: 3-8% monthly (36-96% annual) is common but high. Mid-market: 1-3% monthly. Enterprise: below 1% monthly. High churn is the single biggest destroyer of SaaS value. A business with 8% monthly churn loses 62% of its customers annually, meaning it must replace more than half its base just to stay flat.
+
+Net Revenue Retention (NRR)
+NRR measures revenue growth from the existing customer base, accounting for expansions, contractions, and churn. Formula: NRR = (Starting MRR + Expansion MRR - Churned MRR - Contraction MRR) / Starting MRR. NRR above 100% means the existing customer base is growing in value even without new customers. NRR above 120% is exceptional and indicates strong product-market fit and expansion revenue. Best-in-class Indian SaaS companies achieve NRR of 110-130%.
+
+Contribution Margin
+Contribution margin is revenue minus variable costs (costs that scale directly with each unit sold). For SaaS, variable costs include: cloud hosting (AWS/GCP), third-party API costs, payment processing fees, and customer success labor directly tied to individual accounts. Fixed costs (salaries, office, software subscriptions) are excluded. A healthy contribution margin for SaaS is 60-80%. Marketplaces typically operate at 30-60% contribution margin. D2C physical goods often operate at 30-50%.
+
+Burn Rate and Runway
+Monthly burn rate is the net cash outflow per month (cash spent minus cash received from customers). Runway = Cash in Bank / Monthly Net Burn. Minimum safe runway: 12-18 months. Startups should begin fundraising when they have 9-12 months of runway remaining. In India, typical pre-seed rounds are ₹50 lakh to ₹3 crore. Seed rounds: ₹2-15 crore. Series A: ₹15-100 crore. Monthly burn rates: pre-product teams of 3-5 people in India typically burn ₹8-20 lakh per month.
+
+Healthy vs Unhealthy Benchmarks by Model
+SaaS (healthy): LTV:CAC >3x, payback <18 months, NRR >110%, gross margin >70%, monthly churn <3%. Marketplace (healthy): take rate 10-20%, contribution margin >40%, seller retention >80%, GMV growth >50% YoY. D2C (healthy): gross margin >50%, repeat purchase rate >30%, CAC <₹500, customer payback <90 days.

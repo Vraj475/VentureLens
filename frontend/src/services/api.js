@@ -1,144 +1,126 @@
 import axios from 'axios';
-import { auth } from '../firebase.js';
-import {
-  MOCK_SESSION,
-  MOCK_REPORT_MARKDOWN,
-  MOCK_SESSIONS_LIST,
-  MOCK_USER,
-} from '../data/mockData.js';
+import { auth } from '../firebase';
 
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+// Standard instance for fast endpoints
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
+  baseURL: BASE_URL,
+  timeout: 15000,
+  headers: { 'Content-Type': 'application/json' }
 });
 
-async function getAuthToken() {
-  const user = auth.currentUser;
-  if (!user) throw new Error('Not authenticated');
-  return user.getIdToken();
-}
+// Long-timeout instance for analysis (Gemini calls take 30+ seconds)
+const apiLong = axios.create({
+  baseURL: BASE_URL,
+  timeout: 120000,
+  headers: { 'Content-Type': 'application/json' }
+});
 
-async function authHeaders() {
-  const token = await getAuthToken();
-  return { Authorization: `Bearer ${token}` };
-}
-
-export async function getMe() {
+// Attach Firebase token to both instances
+async function attachToken(config) {
   try {
-    const headers = await authHeaders();
-    return (await api.get('/api/users/me', { headers })).data;
-  } catch {
-    return MOCK_USER;
+    const user = auth.currentUser;
+    if (user) {
+      const token = await user.getIdToken(false);
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (err) {
+    console.warn('Could not get auth token:', err.message);
   }
+  return config;
 }
 
-export async function createUser(uid, email, displayName) {
-  try {
-    const headers = await authHeaders();
-    return (
-      await api.post('/api/users/create', { uid, email, displayName }, { headers })
-    ).data;
-  } catch {
-    return { ...MOCK_USER, uid, email, displayName };
+api.interceptors.request.use(attachToken, Promise.reject);
+apiLong.interceptors.request.use(attachToken, Promise.reject);
+
+// Response error handler — convert network errors to readable messages
+function handleError(error) {
+  if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+    console.error('Network Error — backend may not be running at', BASE_URL);
+    const err = new Error(`Cannot reach the server. Make sure the backend is running on port ${BASE_URL.split(':').pop()}.`);
+    err.isNetworkError = true;
+    return Promise.reject(err);
   }
-}
-
-export async function getSessions() {
-  try {
-    const headers = await authHeaders();
-    return (await api.get('/api/sessions/list', { headers })).data;
-  } catch {
-    return MOCK_SESSIONS_LIST;
+  if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+    console.error('Request timed out:', error.config?.url);
+    const err = new Error('Request timed out. The analysis is taking longer than expected.');
+    err.isTimeout = true;
+    return Promise.reject(err);
   }
+  if (error.response) {
+    console.error('API Error:', error.response.status, error.config?.url, error.response.data);
+  }
+  return Promise.reject(error);
 }
 
-export async function clearHistory() {
+api.interceptors.response.use(r => r, handleError);
+apiLong.interceptors.response.use(r => r, handleError);
+
+// Connection check — call this before any API call chain
+export async function checkConnection() {
   try {
-    const headers = await authHeaders();
-    return (await api.delete('/api/sessions/all', { headers })).data;
+    await axios.get(`${BASE_URL}/ping`, { timeout: 3000 });
+    return true;
   } catch {
-    return { success: true };
+    return false;
   }
 }
 
 export async function createSession() {
-  try {
-    const headers = await authHeaders();
-    return (await api.post('/api/sessions', {}, { headers })).data;
-  } catch {
-    return { sessionId: 'mock-session-123' };
-  }
+  const r = await api.post('/api/sessions');
+  return r.data;
 }
 
 export async function submitIdea(sessionId, rawIdea) {
-  // return (await api.post(`/api/sessions/${sessionId}/idea`, { rawIdea }, { headers: await authHeaders() })).data;
-  return {
-    structuredIdea: MOCK_SESSION.structuredIdea,
-    nextQuestion: MOCK_SESSION.interviewAnswers[0].question,
-    questionIndex: 1,
-    totalQuestions: 5,
-  };
+  const r = await api.post(`/api/sessions/${sessionId}/idea`, { rawIdea });
+  return r.data;
 }
 
-export async function submitAnswer(sessionId, question, answer) {
-  // return (await api.post(`/api/sessions/${sessionId}/answer`, { question, answer }, { headers: await authHeaders() })).data;
-  return {
-    done: false,
-    nextQuestion: 'Next mock question',
-    questionIndex: 2,
-    totalQuestions: 5,
-  };
+export async function submitAnswer(sessionId, question, answer, slot) {
+  const r = await api.post(`/api/sessions/${sessionId}/answer`, { question, answer, slot });
+  return r.data;
 }
 
-export async function triggerResearch(sessionId) {
-  // return (await api.post(`/api/sessions/${sessionId}/research`, {}, { headers: await authHeaders() })).data;
-  return {
-    ragResults: MOCK_SESSION.ragResults,
-    webResults: MOCK_SESSION.webResults,
-  };
+// Use long-timeout instance — this calls Gemini 6+ times
+export async function runAnalysis(sessionId) {
+  const r = await apiLong.post(`/api/sessions/${sessionId}/analyze`);
+  return r.data;
 }
 
-export async function triggerAnalysis(sessionId) {
-  // return (await api.post(`/api/sessions/${sessionId}/analyze`, {}, { headers: await authHeaders() })).data;
-  return {
-    analysis: MOCK_SESSION.analysis,
-    feasibilityScore: MOCK_SESSION.feasibilityScore,
-    risks: MOCK_SESSION.risks,
-    assumptions: MOCK_SESSION.assumptions,
-  };
-}
-
+// Use long-timeout instance
 export async function challengeIdea(sessionId) {
-  // return (await api.post(`/api/sessions/${sessionId}/challenge`, {}, { headers: await authHeaders() })).data;
-  return { devilsAdvocate: MOCK_SESSION.devilsAdvocate };
+  const r = await apiLong.post(`/api/sessions/${sessionId}/challenge`);
+  return r.data;
 }
 
 export async function generateReport(sessionId) {
-  // return (await api.post(`/api/sessions/${sessionId}/report`, {}, { headers: await authHeaders() })).data;
-  const blob = new Blob([MOCK_REPORT_MARKDOWN], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'VentureLens-Report.txt';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-  return { reportId: 'mock-report-123' };
+  const r = await apiLong.post(`/api/sessions/${sessionId}/report`);
+  return r.data;
 }
 
 export async function getReport(reportId) {
-  // return (await api.get(`/api/reports/${reportId}`, { headers: await authHeaders() })).data;
-  return {
-    reportId: 'mock-report-123',
-    sessionId: MOCK_SESSION.sessionId,
-    reportMarkdown: MOCK_REPORT_MARKDOWN,
-    feasibilityScore: MOCK_SESSION.feasibilityScore,
-    analysis: MOCK_SESSION.analysis,
-    risks: MOCK_SESSION.risks,
-    devilsAdvocate: MOCK_SESSION.devilsAdvocate,
-    businessProfile: MOCK_SESSION.structuredIdea,
-    createdAt: new Date().toISOString(),
-  };
+  const r = await api.get(`/api/reports/${reportId}`);
+  return r.data;
 }
 
-export default api;
+export async function getMe() {
+  const r = await api.get('/api/users/me');
+  return r.data;
+}
+
+export async function createUser(data) {
+  const r = await api.post('/api/users/create', data);
+  return r.data;
+}
+
+export async function getSessions() {
+  const r = await api.get('/api/users/sessions/list');
+  return r.data;
+}
+
+export async function clearHistory() {
+  const r = await api.delete('/api/users/sessions/all');
+  return r.data;
+}

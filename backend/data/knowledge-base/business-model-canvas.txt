@@ -1,0 +1,33 @@
+The Business Model Canvas: A Framework for Startup Strategy
+
+The Business Model Canvas (BMC) was developed by Alexander Osterwalder and Yves Pigneur and introduced in the book "Business Model Generation" (2010). It is a strategic management template used for developing new business models or documenting existing ones. The canvas condenses a business plan into a single visual document consisting of nine interconnected building blocks.
+
+1. Customer Segments
+Customer Segments define the different groups of people or organizations a company aims to reach and serve. A business may target mass markets (e.g., consumer electronics), niche markets (e.g., professional photography equipment), segmented markets (different customer groups with slightly different needs), or multi-sided platforms (serving two or more interdependent customer groups, such as Uber serving both drivers and riders). Identifying the right segment is the most critical assumption any founder must validate first.
+
+2. Value Propositions
+The Value Proposition is the bundle of products and services that create value for a specific Customer Segment. It answers the question: why would a customer choose you over alternatives? Value can be created through newness (solving a previously unrecognized need), performance improvement, customization, design, price, accessibility, convenience, or risk reduction. A strong value proposition is specific, quantifiable, and customer-validated.
+
+3. Channels
+Channels describe how a company communicates with and reaches its Customer Segments to deliver a Value Proposition. Channels can be own channels (direct sales team, website, physical stores) or partner channels (distributors, retailers, wholesalers). In India, WhatsApp, YouTube, and regional-language platforms serve as powerful distribution channels for reaching Tier 2 and Tier 3 markets.
+
+4. Customer Relationships
+Customer Relationships describes the types of relationships a company establishes with specific Customer Segments. Options include personal assistance, dedicated personal assistance, self-service, automated services, communities, and co-creation. SaaS companies typically rely on automated onboarding with community support. High-ticket B2B companies rely on dedicated account managers.
+
+5. Revenue Streams
+Revenue Streams represent the cash a company generates from each Customer Segment. Revenue models include: asset sale (selling ownership), usage fee (pay-per-use), subscription fees (recurring revenue), lending/renting/leasing, licensing, brokerage/commission fees, and advertising. Each stream has different pricing mechanisms: fixed list prices, negotiated pricing, yield management, real-time market pricing, or auctions.
+
+6. Key Resources
+Key Resources are the most important assets required to make a business model work. They can be physical (manufacturing facilities, machines), intellectual (patents, brand, proprietary knowledge, databases), human (key employees, domain experts), or financial (cash, credit lines, investment capital). For SaaS startups, the key resource is typically the software platform and the team that builds it.
+
+7. Key Activities
+Key Activities are the most important things a company must do to make its business model work. For a product company, key activities include software development, UX design, and platform maintenance. For a marketplace, key activities include platform management, service provider onboarding, and fraud prevention. For a consulting firm, key activities include problem-solving, delivery, and relationship management.
+
+8. Key Partners
+Key Partnerships describe the network of suppliers and partners that make the business model work. Companies form partnerships to optimize their models and reduce risk, acquire particular resources or activities, and access new markets. Types of partnerships include strategic alliances between non-competitors, co-opetition (strategic alliances between competitors), joint ventures, and buyer-supplier relationships.
+
+9. Cost Structure
+The Cost Structure describes all costs incurred to operate a business model. Cost-driven businesses focus on minimizing costs wherever possible (budget airlines, discount retailers). Value-driven businesses focus on premium value creation rather than cost minimization (luxury hotels, boutique consulting). Most startups should aim to be cost-driven early while building toward value-driven pricing as they establish market position.
+
+How Founders Use the Canvas
+Founders use the BMC to test assumptions systematically. Each block represents one or more testable hypotheses. The key discipline is to explicitly label each block entry as "assumption" or "validated." The canvas is a living document — it should be updated after every customer discovery conversation, user interview, or A/B test. Startups that treat the BMC as a static document rather than a hypothesis-testing tool often build products nobody wants.

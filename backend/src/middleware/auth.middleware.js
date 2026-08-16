@@ -1,34 +1,37 @@
-import admin from 'firebase-admin';
+const admin = require('firebase-admin');
 
-let initialized = false;
+if (!admin.apps.length) {
+  try {
+    const privateKey = (process.env.FIREBASE_PRIVATE_KEY || '')
+      .replace(/\\n/g, '\n')
+      .replace(/^"|"$/g, '');
 
-export function getFirebaseAdmin() {
-  if (!initialized && !admin.apps.length) {
     admin.initializeApp({
       credential: admin.credential.cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      }),
+        privateKey
+      })
     });
-    initialized = true;
+    console.log('✓ Firebase Admin initialized');
+  } catch (err) {
+    console.error('✗ Firebase Admin init failed:', err.message);
   }
-  return admin;
 }
 
-export default async function authMiddleware(req, res, next) {
+module.exports = async function authMiddleware(req, res, next) {
+  if (!admin.apps.length) {
+    return res.status(503).json({ error: 'Auth service unavailable — check FIREBASE_* in .env' });
+  }
+  const header = req.headers.authorization;
+  if (!header || !header.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
   try {
-    const header = req.headers.authorization;
-    if (!header?.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const token = header.split('Bearer ')[1];
-    const firebaseAdmin = getFirebaseAdmin();
-    const decoded = await firebaseAdmin.auth().verifyIdToken(token);
+    const decoded = await admin.auth().verifyIdToken(header.split('Bearer ')[1].trim());
     req.user = decoded;
-    return next();
-  } catch {
-    return res.status(401).json({ error: 'Unauthorized' });
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: err.code === 'auth/id-token-expired' ? 'Session expired' : 'Invalid token' });
   }
-}
+};

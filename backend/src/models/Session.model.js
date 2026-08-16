@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const dimensionSchema = new mongoose.Schema(
   {
@@ -12,19 +12,18 @@ const dimensionSchema = new mongoose.Schema(
 const sessionSchema = new mongoose.Schema({
   sessionId: { type: String, required: true, unique: true },
   uid: { type: String, required: true, index: true },
-  sessionTitle: { type: String },
   status: {
     type: String,
     enum: ['idle', 'interviewing', 'researching', 'analyzing', 'complete'],
     default: 'idle',
   },
-  rawIdea: String,
-  structuredIdea: Object,
+  sessionTitle: { type: String, default: 'New Analysis' },
+  rawIdea: { type: String },
+  structuredIdea: { type: Object, default: {} },
   interviewQuestions: [String],
-  interviewAnswers: [{ question: String, answer: String }],
-  businessProfile: Object,
-  ragResults: [Object],
-  webResults: [Object],
+  interviewAnswers: [{ question: String, answer: String, slot: String }],
+  interviewMeta: { type: Object, default: {} },
+  businessProfile: { type: Object, default: {} },
   analysis: {
     marketOpportunity: dimensionSchema,
     problemClarity: dimensionSchema,
@@ -33,16 +32,16 @@ const sessionSchema = new mongoose.Schema({
     founderFit: dimensionSchema,
     riskScore: dimensionSchema,
   },
-  feasibilityScore: Number,
-  risks: [Object],
-  assumptions: [Object],
-  devilsAdvocate: String,
-  reportId: String,
+  feasibilityScore: { type: Number },
+  risks: { type: Array, default: [] },
+  assumptions: { type: Array, default: [] },
+  ragResults: { type: Array, default: [] },
+  webResults: { type: Array, default: [] },
+  devilsAdvocate: { type: String },
+  reportId: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 
-sessionSchema.index({ uid: 1 });
+const Session = mongoose.models.Session || mongoose.model('Session', sessionSchema);
 
-const Session = mongoose.model('Session', sessionSchema);
-
-export default Session;
+module.exports = Session;

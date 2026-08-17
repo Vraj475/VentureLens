@@ -34,6 +34,10 @@ export function ChatProvider({ children }) {
   function addMessage(msg) { setMessages(prev => [...prev, msg]); }
   function removeMessage(id) { setMessages(prev => prev.filter(m => m.id !== id)); }
 
+  function updateMessageContent(id, chunkToAppend) {
+    setMessages(prev => prev.map(m => (m.id === id ? { ...m, content: (m.content || '') + chunkToAppend } : m)));
+  }
+
   function lockInput() { setInputLocked(true); }
   function unlockInput() { setInputLocked(false); }
 
@@ -66,10 +70,6 @@ export function ChatProvider({ children }) {
     }
   }
 
-  // Only one sync request in flight at a time. If another one is requested while
-  // one is already running, it gets queued and re-run once the current one finishes
-  // with the LATEST data — this is what actually prevents the version conflict,
-  // on top of the backend now using an atomic update.
   async function performSync(sid) {
     if (!sid) return;
     if (syncInFlightRef.current) {
@@ -182,17 +182,15 @@ export function ChatProvider({ children }) {
         });
       }
 
-      // Reconcile with the real backend state instead of trusting a local filter —
-      // this is what guarantees the sidebar reflects the database, not an animation.
       await refreshSessionsList();
     } catch (err) {
       console.error('[deleteSession] FAILED:', err.message, err.response?.data);
       alert('Could not delete this analysis. Check your connection and try again.');
-      await refreshSessionsList(); // show the true state regardless
+      await refreshSessionsList();
     }
   }
 
-  function revealAnalysisSequence(data) {
+  function revealAnalysisSequence(data, onComplete) {
     const { analysis, feasibilityScore, risks, assumptions, devilsAdvocate, ragResults, webResults } = data;
     markSourcesReady({ ragResults: ragResults || [], webResults: webResults || [] });
 
@@ -210,10 +208,14 @@ export function ChatProvider({ children }) {
 
             const afterAssumptions = () => {
               setTimeout(() => {
-                addMessage({ id: 'download-' + Date.now(), type: 'download', content: { sessionId: activeSessionIdRef.current }, timestamp: new Date().toISOString() });
-                setInputLocked(false);
-                setIsGenerating(false);
-                flushSync();
+                if (onComplete) {
+                  onComplete();
+                } else {
+                  addMessage({ id: 'download-' + Date.now(), type: 'download', content: { sessionId: activeSessionIdRef.current }, timestamp: new Date().toISOString() });
+                  setInputLocked(false);
+                  setIsGenerating(false);
+                  flushSync();
+                }
               }, 500);
             };
 
@@ -243,7 +245,7 @@ export function ChatProvider({ children }) {
   const value = {
     sessions, refreshSessionsList,
     activeSessionId, setActiveSessionId,
-    messages, addMessage, removeMessage,
+    messages, addMessage, removeMessage, updateMessageContent,
     interviewPhase, setInterviewPhase,
     currentQuestionData, setCurrentQuestionData,
     inputLocked, lockInput, unlockInput,
@@ -252,7 +254,7 @@ export function ChatProvider({ children }) {
     profileOpen, toggleProfile,
     sourcesAvailable, sessionSources, markSourcesReady,
     startNewSession, switchToSession, deleteSession,
-    revealAnalysisSequence,
+    revealAnalysisSequence, flushSync,
     newAbortController, stopGeneration
   };
 

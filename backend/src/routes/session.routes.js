@@ -12,5 +12,7 @@ router.post('/:id/challenge', ctrl.challengeSession);
 router.post('/:id/report', ctrl.generateReport);
 router.put('/:id/sync', ctrl.syncSession);
 router.delete('/:id', ctrl.deleteSession);
+router.post('/:id/report/stream', ctrl.streamReport);
+router.post('/:id/chat', ctrl.chatFollowUp);
 
 module.exports = router;

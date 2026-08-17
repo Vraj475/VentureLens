@@ -4,17 +4,17 @@ import Sidebar from '../components/Sidebar/Sidebar';
 import ChatArea from '../components/ChatArea/ChatArea';
 import SourcesPanel from '../components/SourcesPanel/SourcesPanel';
 import ProfilePanel from '../components/ProfilePanel/ProfilePanel';
-import { createSession, submitIdea, submitAnswer, runAnalysis, challengeIdea } from '../services/api';
+import { createSession, submitIdea, submitAnswer, runAnalysis, challengeIdea, streamReportAPI, chatFollowUp } from '../services/api';
 import './App.css';
 
 export default function App() {
   const {
-    messages, addMessage, removeMessage,
+    messages, addMessage, removeMessage, updateMessageContent,
     interviewPhase, setInterviewPhase,
     currentQuestionData, setCurrentQuestionData,
     activeSessionId, setActiveSessionId,
     lockInput, unlockInput, setIsGenerating,
-    revealAnalysisSequence,
+    revealAnalysisSequence, flushSync,
     startNewSession, refreshSessionsList,
     newAbortController, stopGeneration,
     sourcesOpen, profileOpen
@@ -43,6 +43,25 @@ export default function App() {
   function handleStop() {
     stopGeneration();
     addMessage({ id: 'stopped-' + Date.now(), type: 'bot-text', content: 'Generation stopped.', timestamp: new Date().toISOString() });
+  }
+
+  async function streamReportIntoChat(sessionId) {
+    const streamMsgId = 'report-' + Date.now();
+    addMessage({ id: streamMsgId, type: 'bot-text', content: '', timestamp: new Date().toISOString() });
+
+    let reportId = null;
+    try {
+      reportId = await streamReportAPI(sessionId, (chunk) => {
+        updateMessageContent(streamMsgId, chunk);
+      });
+    } catch (err) {
+      console.error('Report streaming failed:', err.message);
+      updateMessageContent(streamMsgId, '\n\n(Report generation failed. You can try again from the sidebar.)');
+    }
+
+    addMessage({ id: 'download-' + Date.now(), type: 'download', content: { sessionId, reportId }, timestamp: new Date().toISOString() });
+    endGenerating();
+    flushSync();
   }
 
   async function handleSend(text) {
@@ -115,6 +134,20 @@ export default function App() {
         addMessage({ id: Date.now().toString(), type: 'bot-text', content: errorText(err), timestamp: new Date().toISOString() });
         endGenerating();
       }
+    } else if (interviewPhase === 'complete' || interviewPhase === 'analyzing') {
+      const typingId = 'typing-' + Date.now();
+      addMessage({ id: typingId, type: 'typing', content: null, timestamp: new Date().toISOString() });
+
+      try {
+        const result = await chatFollowUp(activeSessionId, text);
+        removeMessage(typingId);
+        addMessage({ id: Date.now().toString(), type: 'bot-text', content: result.reply, timestamp: new Date().toISOString() });
+        endGenerating();
+      } catch (err) {
+        removeMessage(typingId);
+        addMessage({ id: Date.now().toString(), type: 'bot-text', content: errorText(err), timestamp: new Date().toISOString() });
+        endGenerating();
+      }
     }
   }
 
@@ -133,19 +166,21 @@ export default function App() {
         challengeResult = await challengeIdea(sessionId, controller.signal);
       }
 
-      revealAnalysisSequence({
-        analysis: analysisResult.analysis,
-        feasibilityScore: analysisResult.feasibilityScore,
-        risks: analysisResult.risks,
-        assumptions: analysisResult.assumptions,
-        devilsAdvocate: challengeResult.devilsAdvocate,
-        ragResults: analysisResult.ragResults || [],
-        webResults: analysisResult.webResults || []
-      });
+      revealAnalysisSequence(
+        {
+          analysis: analysisResult.analysis,
+          feasibilityScore: analysisResult.feasibilityScore,
+          risks: analysisResult.risks,
+          assumptions: analysisResult.assumptions,
+          devilsAdvocate: challengeResult.devilsAdvocate,
+          ragResults: analysisResult.ragResults || [],
+          webResults: analysisResult.webResults || []
+        },
+        () => streamReportIntoChat(sessionId)
+      );
 
       setInterviewPhase('complete');
       refreshSessionsList();
-      // Note: revealAnalysisSequence handles its own endGenerating() at the end via ChatContext
     } catch (err) {
       removeMessage(typingId);
       if (isAbortError(err)) { endGenerating(); return; }

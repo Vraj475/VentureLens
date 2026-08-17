@@ -1,10 +1,22 @@
-import { generateReport } from '../../services/api.js';
+import { getReport } from '../../services/api';
 import '../messages/BotTextMessage.css';
 import './DownloadMessage.css';
 
 function DownloadMessage({ content }) {
   const handleDownload = async () => {
-    await generateReport(content.sessionId);
+    try {
+      const report = await getReport(content.reportId);
+      const text = report.reportMarkdown || 'Report unavailable.';
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'VentureLens-Report.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Download failed:', err.message);
+    }
   };
 
   return (

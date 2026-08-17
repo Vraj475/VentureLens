@@ -117,3 +117,38 @@ export async function clearHistory() {
   const r = await api.delete('/api/users/sessions/all');
   return r.data;
 }
+
+export async function streamReportAPI(sessionId, onChunk) {
+  const user = auth.currentUser;
+  const token = user ? await user.getIdToken(false) : null;
+
+  const response = await fetch(`${BASE_URL}/api/sessions/${sessionId}/report/stream`, {
+    method: 'POST',
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok || !response.body) {
+    throw new Error('Failed to start report stream');
+  }
+
+  const reportId = response.headers.get('X-Report-Id');
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const chunk = decoder.decode(value, { stream: true });
+    if (chunk) onChunk(chunk);
+  }
+
+  return reportId;
+}
+
+export async function chatFollowUp(sessionId, message) {
+  const r = await api.post(`/api/sessions/${sessionId}/chat`, { message });
+  return r.data;
+}

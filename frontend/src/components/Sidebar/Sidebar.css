@@ -40,7 +40,9 @@
   padding: 16px 8px 8px;
 }
 
+.session-item,
 .sidebar-session-item {
+  position: relative;
   padding: 10px 12px;
   border-radius: 8px;
   cursor: pointer;
@@ -61,6 +63,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-right: 24px;
 }
 
 .sidebar-session-meta {
@@ -92,6 +95,38 @@
 .sidebar-score-badge--low {
   background: rgba(244, 67, 54, 0.15);
   color: var(--danger);
+}
+
+.session-delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.sidebar-session-item:hover .session-delete-btn,
+.session-item:hover .session-delete-btn {
+  display: flex;
+}
+
+.session-delete-btn:hover {
+  background: rgba(244, 67, 54, 0.15);
+  color: var(--danger);
+}
+
+.session-delete-btn.confirming {
+  display: flex;
+  background: var(--danger);
+  color: white;
 }
 
 .sidebar-bottom {

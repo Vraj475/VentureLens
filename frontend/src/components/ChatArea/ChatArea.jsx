@@ -4,11 +4,12 @@ import MessageRenderer from '../MessageRenderer/MessageRenderer';
 import ChatInput from '../ChatInput/ChatInput';
 import './ChatArea.css';
 
-function ChatArea({ onSend, onOptionSelect }) {
+function ChatArea({ onSend, onOptionSelect, onStop }) {
   const {
     messages,
     activeSessionTitle,
     inputLocked,
+    isGenerating,
     toggleSources,
     sourcesAvailable,
   } = useChat();
@@ -43,7 +44,12 @@ function ChatArea({ onSend, onOptionSelect }) {
         <div ref={messagesEndRef} className="chat-messages-end" />
       </div>
 
-      <ChatInput onSend={onSend} disabled={inputLocked} />
+      <ChatInput
+        onSend={onSend}
+        disabled={inputLocked}
+        isGenerating={isGenerating}
+        onStop={onStop}
+      />
     </div>
   );
 }

@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import './ChatInput.css';
 
-function ChatInput({ onSend, disabled, placeholder = 'Describe your business idea...' }) {
+function ChatInput({
+  onSend,
+  disabled,
+  isGenerating,
+  onStop,
+  placeholder = 'Describe your business idea...',
+}) {
   const [value, setValue] = useState('');
 
   const lineCount = value.split('\n').length;
@@ -35,15 +41,26 @@ function ChatInput({ onSend, disabled, placeholder = 'Describe your business ide
           onChange={(event) => setValue(event.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button
-          type="button"
-          className="chat-input-send"
-          disabled={!canSend}
-          onClick={handleSend}
-          aria-label="Send message"
-        >
-          ↑
-        </button>
+        {isGenerating ? (
+          <button
+            type="button"
+            className="chat-input-send stop-btn"
+            onClick={onStop}
+            aria-label="Stop generating"
+          >
+            <span className="stop-icon" />
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="chat-input-send"
+            disabled={!canSend}
+            onClick={handleSend}
+            aria-label="Send message"
+          >
+            ↑
+          </button>
+        )}
       </div>
       {value.length > 0 && (
         <div className="chat-input-counter">{value.length} characters</div>

@@ -39,8 +39,10 @@ const sessionSchema = new mongoose.Schema({
   webResults: { type: Array, default: [] },
   devilsAdvocate: { type: String },
   reportId: { type: String },
+  messages: { type: Array, default: [] },
+  uiState: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now },
-});
+}, { versionKey: false });
 
 const Session = mongoose.models.Session || mongoose.model('Session', sessionSchema);
 

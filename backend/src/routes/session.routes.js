@@ -10,5 +10,7 @@ router.post('/:id/answer', ctrl.submitAnswer);
 router.post('/:id/analyze', ctrl.runAnalysis);
 router.post('/:id/challenge', ctrl.challengeSession);
 router.post('/:id/report', ctrl.generateReport);
+router.put('/:id/sync', ctrl.syncSession);
+router.delete('/:id', ctrl.deleteSession);
 
 module.exports = router;

@@ -1,201 +1,266 @@
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { getSessions, getSessionDetail, syncSession as syncSessionAPI, deleteSession as deleteSessionAPI } from '../services/api';
 
 const ChatContext = createContext(null);
-
-const delay = (ms) => new Promise((resolve) => {
-  setTimeout(resolve, ms);
-});
-
-const GREETING = {
-  id: 'greeting',
-  type: 'bot-text',
-  content: 'Hi! Tell me your business idea and we will research it together.',
-  timestamp: new Date().toISOString(),
-};
 
 export function ChatProvider({ children }) {
   const [sessions, setSessions] = useState([]);
   const [activeSessionId, setActiveSessionId] = useState(null);
-  const [activeSessionTitle, setActiveSessionTitle] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [interviewPhase, setInterviewPhase] = useState('awaiting_idea');
+  const [currentQuestionData, setCurrentQuestionData] = useState(null);
   const [inputLocked, setInputLocked] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-
-  // Sources availability state (Changes 2A & 2B)
   const [sourcesAvailable, setSourcesAvailable] = useState(false);
   const [sessionSources, setSessionSources] = useState({ ragResults: [], webResults: [] });
 
-  const addMessage = useCallback((messageObj) => {
-    setMessages((prev) => [
-      ...prev,
-      {
-        ...messageObj,
-        id: messageObj.id || `msg-${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        timestamp: messageObj.timestamp || new Date().toISOString(),
-      },
-    ]);
-  }, []);
+  const abortControllerRef = useRef(null);
+  const syncTimeoutRef = useRef(null);
+  const syncInFlightRef = useRef(false);
+  const syncQueuedRef = useRef(false);
 
-  // Change 6 — removeMessage by id
-  const removeMessage = useCallback((id) => {
-    setMessages((prev) => prev.filter((m) => m.id !== id));
-  }, []);
+  const messagesRef = useRef(messages);
+  const activeSessionIdRef = useRef(activeSessionId);
+  const interviewPhaseRef = useRef(interviewPhase);
+  const currentQuestionDataRef = useRef(currentQuestionData);
 
-  const removeTyping = useCallback(() => {
-    setMessages((prev) => prev.filter((m) => m.type !== 'typing'));
-  }, []);
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
+  useEffect(() => { activeSessionIdRef.current = activeSessionId; }, [activeSessionId]);
+  useEffect(() => { interviewPhaseRef.current = interviewPhase; }, [interviewPhase]);
+  useEffect(() => { currentQuestionDataRef.current = currentQuestionData; }, [currentQuestionData]);
 
-  const addTyping = useCallback(() => {
-    addMessage({ type: 'typing', content: null });
-  }, [addMessage]);
+  function addMessage(msg) { setMessages(prev => [...prev, msg]); }
+  function removeMessage(id) { setMessages(prev => prev.filter(m => m.id !== id)); }
 
-  const lockInput = useCallback(() => setInputLocked(true), []);
-  const unlockInput = useCallback(() => setInputLocked(false), []);
+  function lockInput() { setInputLocked(true); }
+  function unlockInput() { setInputLocked(false); }
 
-  const toggleSources = useCallback(() => {
-    setSourcesOpen((prev) => !prev);
-    setProfileOpen(false);
-  }, []);
+  function toggleSources() { setSourcesOpen(prev => !prev); }
+  function toggleProfile() { setProfileOpen(prev => !prev); }
 
-  const toggleProfile = useCallback(() => {
-    setProfileOpen((prev) => !prev);
-    setSourcesOpen(false);
-  }, []);
-
-  // Change 2B — markSourcesReady
-  const markSourcesReady = useCallback((sources) => {
+  function markSourcesReady(sources) {
     setSourcesAvailable(true);
     setSessionSources(sources);
-  }, []);
+  }
 
-  const startNewSession = useCallback(() => {
-    const newId = `session-${Date.now()}`;
-    setActiveSessionId(newId);
-    setActiveSessionTitle(null);
-    setMessages([{ ...GREETING, id: 'greeting', timestamp: new Date().toISOString() }]);
+  function newAbortController() {
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    return controller;
+  }
+
+  function stopGeneration() {
+    if (abortControllerRef.current) abortControllerRef.current.abort();
     setInputLocked(false);
-    setSourcesOpen(false);
+    setIsGenerating(false);
+  }
+
+  async function refreshSessionsList() {
+    try {
+      const list = await getSessions();
+      setSessions(list);
+    } catch (err) {
+      console.error('Failed to refresh sessions:', err.message);
+    }
+  }
+
+  // Only one sync request in flight at a time. If another one is requested while
+  // one is already running, it gets queued and re-run once the current one finishes
+  // with the LATEST data — this is what actually prevents the version conflict,
+  // on top of the backend now using an atomic update.
+  async function performSync(sid) {
+    if (!sid) return;
+    if (syncInFlightRef.current) {
+      syncQueuedRef.current = true;
+      return;
+    }
+    syncInFlightRef.current = true;
+    try {
+      await syncSessionAPI(sid, {
+        messages: messagesRef.current,
+        interviewPhase: interviewPhaseRef.current,
+        currentQuestionData: currentQuestionDataRef.current
+      });
+    } catch (err) {
+      console.error('[sync] failed:', err.message);
+    } finally {
+      syncInFlightRef.current = false;
+      if (syncQueuedRef.current) {
+        syncQueuedRef.current = false;
+        performSync(sid);
+      }
+    }
+  }
+
+  async function flushSync() {
+    const sid = activeSessionIdRef.current;
+    if (!sid) return;
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+      syncTimeoutRef.current = null;
+    }
+    await performSync(sid);
+  }
+
+  async function startNewSession() {
+    await flushSync();
+
+    setActiveSessionId(null);
+    setMessages([]);
+    setInterviewPhase('awaiting_idea');
+    setCurrentQuestionData(null);
     setSourcesAvailable(false);
     setSessionSources({ ragResults: [], webResults: [] });
-  }, []);
-
-  const loadSession = useCallback((sessionId) => {
-    setActiveSessionId(sessionId);
-    const session = sessions.find((s) => s.sessionId === sessionId);
-    setActiveSessionTitle(session?.sessionTitle || 'Past Analysis');
-    setMessages([{ ...GREETING, timestamp: new Date().toISOString() }]);
     setInputLocked(false);
-    setSourcesOpen(false);
-    setProfileOpen(false);
-    setSourcesAvailable(false);
-    setSessionSources({ ragResults: [], webResults: [] });
-  }, [sessions]);
+    setIsGenerating(false);
+    addMessage({
+      id: 'greet-' + Date.now(),
+      type: 'bot-text',
+      content: 'Hi! Tell me your business idea and we will research it together.',
+      timestamp: new Date().toISOString()
+    });
+  }
 
-  const setSessionsList = useCallback((list) => {
-    setSessions(list);
-  }, []);
+  async function switchToSession(sessionId) {
+    if (sessionId === activeSessionIdRef.current) return;
 
-  const clearSessions = useCallback(() => {
-    setSessions([]);
-    startNewSession();
-  }, [startNewSession]);
+    await flushSync();
 
-  // Change 6 — revealAnalysisSequence rewritten to accept full data object
-  // and call markSourcesReady before the reveal sequence begins
-  const revealAnalysisSequence = useCallback(
-    async (data) => {
-      const {
-        analysis,
-        feasibilityScore,
-        risks,
-        assumptions,
-        devilsAdvocate,
-        ragResults,
-        webResults,
-      } = data;
+    try {
+      lockInput();
+      const session = await getSessionDetail(sessionId);
+      setActiveSessionId(sessionId);
 
-      // Immediately mark sources ready so the Sources button appears
-      markSourcesReady({
-        ragResults: ragResults || [],
-        webResults: webResults || [],
-      });
+      setMessages(
+        Array.isArray(session.messages) && session.messages.length > 0
+          ? session.messages
+          : [{ id: 'greet-' + sessionId, type: 'bot-text', content: 'Hi! Tell me your business idea and we will research it together.', timestamp: new Date().toISOString() }]
+      );
 
-      // Sequential reveal with delays
-      await delay(1500);
-      addMessage({
-        type: 'chart',
-        content: { analysis, feasibilityScore },
-      });
+      const uiState = session.uiState || {};
+      setInterviewPhase(uiState.interviewPhase || (session.status === 'complete' ? 'complete' : 'awaiting_idea'));
+      setCurrentQuestionData(uiState.currentQuestionData || null);
 
-      await delay(1200);
-      addMessage({
-        type: 'bot-text',
-        content: 'Here is the full breakdown across all dimensions.',
-      });
+      if (session.status === 'complete' && ((session.ragResults && session.ragResults.length) || (session.webResults && session.webResults.length))) {
+        markSourcesReady({ ragResults: session.ragResults || [], webResults: session.webResults || [] });
+      } else {
+        setSourcesAvailable(false);
+        setSessionSources({ ragResults: [], webResults: [] });
+      }
+    } catch (err) {
+      console.error('Failed to load session:', err.message);
+    } finally {
+      unlockInput();
+    }
+  }
 
-      await delay(1000);
-      addMessage({ type: 'risk-cards', content: risks });
+  async function deleteSession(sessionId) {
+    console.log('[deleteSession] Requesting delete for', sessionId);
+    try {
+      const result = await deleteSessionAPI(sessionId);
+      console.log('[deleteSession] Backend confirmed:', result);
 
-      await delay(900);
-      addMessage({ type: 'assumptions', content: assumptions });
-
-      if (devilsAdvocate) {
-        await delay(800);
-        addMessage({ type: 'devil', content: devilsAdvocate });
+      if (result.deleted === 0) {
+        console.warn('[deleteSession] Backend reported nothing was deleted.');
+        alert('Could not delete — the analysis may already be gone. Refreshing the list.');
       }
 
-      await delay(500);
-      addMessage({
-        type: 'download',
-        content: { sessionId: activeSessionId },
-      });
+      if (sessionId === activeSessionIdRef.current) {
+        setActiveSessionId(null);
+        setMessages([]);
+        setInterviewPhase('awaiting_idea');
+        setCurrentQuestionData(null);
+        setSourcesAvailable(false);
+        setSessionSources({ ragResults: [], webResults: [] });
+        addMessage({
+          id: 'greet-' + Date.now(),
+          type: 'bot-text',
+          content: 'Hi! Tell me your business idea and we will research it together.',
+          timestamp: new Date().toISOString()
+        });
+      }
 
-      unlockInput();
-    },
-    [activeSessionId, addMessage, markSourcesReady, unlockInput],
-  );
+      // Reconcile with the real backend state instead of trusting a local filter —
+      // this is what guarantees the sidebar reflects the database, not an animation.
+      await refreshSessionsList();
+    } catch (err) {
+      console.error('[deleteSession] FAILED:', err.message, err.response?.data);
+      alert('Could not delete this analysis. Check your connection and try again.');
+      await refreshSessionsList(); // show the true state regardless
+    }
+  }
 
-  return (
-    <ChatContext.Provider
-      value={{
-        sessions,
-        activeSessionId,
-        activeSessionTitle,
-        setActiveSessionTitle,
-        messages,
-        inputLocked,
-        sourcesOpen,
-        profileOpen,
-        // Change 2C — expose new state and function
-        sourcesAvailable,
-        sessionSources,
-        markSourcesReady,
-        // Change 6 — expose removeMessage
-        removeMessage,
-        setSessionsList,
-        startNewSession,
-        loadSession,
-        addMessage,
-        removeTyping,
-        addTyping,
-        lockInput,
-        unlockInput,
-        toggleSources,
-        toggleProfile,
-        revealAnalysisSequence,
-        clearSessions,
-      }}
-    >
-      {children}
-    </ChatContext.Provider>
-  );
+  function revealAnalysisSequence(data) {
+    const { analysis, feasibilityScore, risks, assumptions, devilsAdvocate, ragResults, webResults } = data;
+    markSourcesReady({ ragResults: ragResults || [], webResults: webResults || [] });
+
+    setTimeout(() => {
+      addMessage({ id: 'chart-' + Date.now(), type: 'chart', content: { analysis, feasibilityScore }, timestamp: new Date().toISOString() });
+
+      setTimeout(() => {
+        addMessage({ id: 'summary-' + Date.now(), type: 'bot-text', content: 'Here is the full breakdown across all dimensions.', timestamp: new Date().toISOString() });
+
+        setTimeout(() => {
+          addMessage({ id: 'risks-' + Date.now(), type: 'risk-cards', content: risks, timestamp: new Date().toISOString() });
+
+          setTimeout(() => {
+            addMessage({ id: 'assumptions-' + Date.now(), type: 'assumptions', content: assumptions, timestamp: new Date().toISOString() });
+
+            const afterAssumptions = () => {
+              setTimeout(() => {
+                addMessage({ id: 'download-' + Date.now(), type: 'download', content: { sessionId: activeSessionIdRef.current }, timestamp: new Date().toISOString() });
+                setInputLocked(false);
+                setIsGenerating(false);
+                flushSync();
+              }, 500);
+            };
+
+            if (devilsAdvocate) {
+              setTimeout(() => {
+                addMessage({ id: 'devil-' + Date.now(), type: 'devil', content: devilsAdvocate, timestamp: new Date().toISOString() });
+                afterAssumptions();
+              }, 800);
+            } else {
+              afterAssumptions();
+            }
+          }, 900);
+        }, 1000);
+      }, 1200);
+    }, 1500);
+  }
+
+  useEffect(() => {
+    if (!activeSessionId) return;
+    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    syncTimeoutRef.current = setTimeout(() => {
+      performSync(activeSessionId);
+    }, 700);
+    return () => clearTimeout(syncTimeoutRef.current);
+  }, [messages, interviewPhase, currentQuestionData, activeSessionId]);
+
+  const value = {
+    sessions, refreshSessionsList,
+    activeSessionId, setActiveSessionId,
+    messages, addMessage, removeMessage,
+    interviewPhase, setInterviewPhase,
+    currentQuestionData, setCurrentQuestionData,
+    inputLocked, lockInput, unlockInput,
+    isGenerating, setIsGenerating,
+    sourcesOpen, toggleSources,
+    profileOpen, toggleProfile,
+    sourcesAvailable, sessionSources, markSourcesReady,
+    startNewSession, switchToSession, deleteSession,
+    revealAnalysisSequence,
+    newAbortController, stopGeneration
+  };
+
+  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
 }
 
 export function useChat() {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error('useChat must be used within ChatProvider');
-  }
-  return context;
+  const ctx = useContext(ChatContext);
+  if (!ctx) throw new Error('useChat must be used within ChatProvider');
+  return ctx;
 }

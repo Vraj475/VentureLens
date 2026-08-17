@@ -101,8 +101,51 @@ async function getSession(req, res, next) {
   try {
     const session = await Session.findOne({ sessionId: req.params.id, uid: req.user.uid });
     if (!session) return res.status(404).json({ error: 'Session not found' });
+    console.log(`[GET SESSION] ${req.params.id} has ${(session.messages || []).length} messages in DB`);
     res.json(session);
   } catch (err) { next(err); }
 }
 
-module.exports = { createSession, submitIdea, submitAnswer, runAnalysis, challengeSession, generateReport, getSession };
+async function syncSession(req, res, next) {
+  try {
+    const { messages, interviewPhase, currentQuestionData } = req.body;
+    const update = {
+      uiState: { interviewPhase: interviewPhase || null, currentQuestionData: currentQuestionData || null }
+    };
+    if (Array.isArray(messages)) update.messages = messages;
+
+    const session = await Session.findOneAndUpdate(
+      { sessionId: req.params.id, uid: req.user.uid },
+      { $set: update },
+      { new: true }
+    );
+
+    if (!session) {
+      console.log(`[SYNC] No session found for ${req.params.id} — likely already deleted, ignoring.`);
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    console.log(`[SYNC] Atomic update ok. Session ${req.params.id} now has ${session.messages.length} messages.`);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[SYNC] Failed:', err.message);
+    next(err);
+  }
+}
+
+async function deleteSession(req, res, next) {
+  try {
+    console.log(`[DELETE] Request to delete session ${req.params.id} from uid ${req.user.uid}`);
+    const result = await Session.deleteOne({ sessionId: req.params.id, uid: req.user.uid });
+    console.log(`[DELETE] Result: deletedCount=${result.deletedCount}`);
+    if (result.deletedCount === 0) {
+      console.warn(`[DELETE] Nothing was deleted — session may not exist or uid did not match.`);
+    }
+    res.json({ success: true, deleted: result.deletedCount });
+  } catch (err) {
+    console.error('[DELETE] Failed:', err.message);
+    next(err);
+  }
+}
+
+module.exports = { createSession, submitIdea, submitAnswer, runAnalysis, challengeSession, generateReport, getSession, syncSession, deleteSession };

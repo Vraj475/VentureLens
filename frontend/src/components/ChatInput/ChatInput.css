@@ -67,3 +67,7 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+.stop-btn { background: var(--danger); }
+.stop-btn:hover { opacity: 0.85; }
+.stop-icon { width: 12px; height: 12px; background: white; border-radius: 3px; display: inline-block; }

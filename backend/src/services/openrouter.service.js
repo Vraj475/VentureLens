@@ -26,13 +26,31 @@ async function webResearch(queries) {
   const results = [];
   for (const query of queries) {
     try {
-      const content = await callOpenRouter('perplexity/sonar',
-        [{ role: 'user', content: `Research: ${query}\nProvide specific data, under 200 words.` }],
-        'You are a market research analyst. Be factual and specific.');
-      results.push({ query, content, source: 'Web Research' });
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://venturelens.app',
+          'X-Title': 'VentureLens'
+        },
+        body: JSON.stringify({
+          model: 'perplexity/sonar',
+          messages: [
+            { role: 'system', content: 'You are a market research analyst. Provide factual, current information with SPECIFIC NUMERIC DATA — market size figures in dollars or rupees, growth rate percentages, user counts, funding amounts. Always include real numbers when available, not vague statements.' },
+            { role: 'user', content: `Research: ${query}\nProvide specific numbers and statistics. Under 200 words.` }
+          ],
+          max_tokens: 1000
+        })
+      });
+      if (!response.ok) throw new Error(`OpenRouter ${response.status}`);
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content || 'No data returned.';
+      const citations = Array.isArray(data.citations) ? data.citations : [];
+      results.push({ query, content, source: 'Web Research', urls: citations });
     } catch (err) {
       console.warn('Web query failed:', query, err.message);
-      results.push({ query, content: 'Research unavailable.', source: 'Web Research' });
+      results.push({ query, content: 'Research unavailable.', source: 'Web Research', urls: [] });
     }
   }
   return results;

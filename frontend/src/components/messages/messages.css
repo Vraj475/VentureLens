@@ -1,10 +1,14 @@
-.user-text-message {
+.user-text-message,
+.message-row.user {
   display: flex;
   justify-content: flex-end;
+  align-items: flex-start;
+  gap: 10px;
   margin-bottom: 12px;
 }
 
-.user-text-bubble {
+.user-text-bubble,
+.user-bubble {
   background: var(--accent);
   color: var(--text);
   border-radius: 16px 4px 16px 16px;
@@ -12,4 +16,18 @@
   max-width: 72%;
   font-size: 14px;
   line-height: 1.6;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }

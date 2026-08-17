@@ -9,7 +9,7 @@ function ChatInput({ onSend, disabled, placeholder = 'Describe your business ide
 
   const handleSend = () => {
     const trimmed = value.trim();
-    if (trimmed.length < 15 || disabled) return;
+    if (trimmed.length === 0 || disabled) return;
     onSend(trimmed);
     setValue('');
   };
@@ -21,7 +21,7 @@ function ChatInput({ onSend, disabled, placeholder = 'Describe your business ide
     }
   };
 
-  const canSend = value.trim().length >= 15 && !disabled;
+  const canSend = value.trim().length > 0 && !disabled;
 
   return (
     <div className="chat-input-area">

@@ -69,7 +69,11 @@ function MainApp() {
         const analysisResult = await runAnalysis(sessionId);
         removeMessage(typingId);
 
-        const challengeResult = await challengeIdea(sessionId);
+        const devilsAdvocateEnabled = localStorage.getItem('venturelens_devils_advocate') !== 'false';
+        let challengeResult = { devilsAdvocate: null };
+        if (devilsAdvocateEnabled) {
+          challengeResult = await challengeIdea(sessionId);
+        }
 
         removeMessage('analyzing-msg');
         revealAnalysisSequence({

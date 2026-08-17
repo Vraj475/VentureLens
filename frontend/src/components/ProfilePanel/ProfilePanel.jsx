@@ -1,25 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useChat } from '../../context/ChatContext';
 import './ProfilePanel.css';
 
 function ProfilePanel({ isOpen, onClose }) {
   const { currentUser, userProfile, logout } = useAuth();
-  const { } = useChat();
-  const [settings, setSettings] = useState({
-    devilsAdvocate: true,
+  const [devilOn, setDevilOn] = useState(() => {
+    const saved = localStorage.getItem('venturelens_devils_advocate');
+    return saved === null ? true : saved === 'true';
   });
+
+  function handleToggleDevil() {
+    const newValue = !devilOn;
+    setDevilOn(newValue);
+    localStorage.setItem('venturelens_devils_advocate', String(newValue));
+  }
 
   const displayEmail = currentUser?.email || userProfile?.email || 'No email';
   const initial = (currentUser?.email?.[0] || userProfile?.email?.[0] || 'U').toUpperCase();
-
-  useEffect(() => {
-    if (userProfile?.settings) {
-      setSettings({
-        devilsAdvocate: userProfile.settings.devilsAdvocate !== false,
-      });
-    }
-  }, [userProfile]);
 
   return (
     <aside className={`profile-panel ${isOpen ? 'profile-panel--open' : ''}`}>
@@ -49,15 +46,13 @@ function ProfilePanel({ isOpen, onClose }) {
 
           <div className="profile-toggle-row">
             <span className="profile-setting-label">Show Counter-Arguments</span>
-            <div className="profile-toggle">
+            <div className="profile-toggle" onClick={handleToggleDevil}>
               <input
                 id="devils-toggle"
                 type="checkbox"
                 className="profile-toggle-input"
-                checked={settings.devilsAdvocate}
-                onChange={(event) =>
-                  setSettings((prev) => ({ ...prev, devilsAdvocate: event.target.checked }))
-                }
+                checked={devilOn}
+                onChange={handleToggleDevil}
               />
               <label htmlFor="devils-toggle" className="profile-toggle-label">
                 <span className="profile-toggle-knob" />

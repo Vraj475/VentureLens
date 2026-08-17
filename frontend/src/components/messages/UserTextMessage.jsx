@@ -1,11 +1,14 @@
+import { useAuth } from '../../context/AuthContext';
 import './messages.css';
 
-function UserTextMessage({ content }) {
+export default function UserTextMessage({ content }) {
+  const { currentUser } = useAuth();
+  const initial = (currentUser?.email?.[0] || 'U').toUpperCase();
+
   return (
-    <div className="user-text-message">
-      <div className="user-text-bubble">{content}</div>
+    <div className="message-row user">
+      <div className="user-bubble">{content}</div>
+      <div className="user-avatar">{initial}</div>
     </div>
   );
 }
-
-export default UserTextMessage;
